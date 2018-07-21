@@ -5,8 +5,9 @@ import cv2
 import argparse
 import os
 
+
 # construct the argument parse and parse the arguments
-def parseArgs():
+def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--image", required=True,
                     help="path to input image to be OCR'd")
@@ -15,12 +16,15 @@ def parseArgs():
     args = vars(ap.parse_args())
     return args
 
-args = parseArgs()
 
-def getOriginalImage():
+args = parse_args()
+
+
+def get_original_image():
     return cv2.imread(args["image"])
 
-def convertToGrayScale(image):
+
+def convert_to_gray_scale(image):
     # load the example image and convert it to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return gray
@@ -40,15 +44,16 @@ def applyPreprocessing(image):
 
     return image
 
-def writeGrayscaleImage(grayImage):
 
+def write_grayscale_image(grayImage):
     # write the grayscale image to disk as a temporary file so we can
     # apply OCR to it
     filename = "{}.png".format(os.getpid())
     cv2.imwrite(filename, grayImage)
     return filename
 
-def applyOCR(filename):
+
+def apply_ocr(filename):
     # load the image as a PIL/Pillow image, apply OCR, and then delete
     # the temporary file
     text = pytesseract.image_to_string(Image.open(filename))
@@ -56,19 +61,21 @@ def applyOCR(filename):
     # print(text)
     return text
 
-def showIOImages(input, output):
+
+def show_io_images(input, output):
     # show the output images
     cv2.imshow("Image", input)
     cv2.imshow("Output", output)
     cv2.waitKey(0)
 
+
 if __name__ == '__main__':
-    originalImage = getOriginalImage()
-    grayscaleImage = convertToGrayScale(originalImage)
-    outputImage = applyPreprocessing(grayscaleImage)
-    greyFilename = writeGrayscaleImage(outputImage)
-    text = applyOCR(greyFilename)
+    original_image = get_original_image()
+    grayscale_image = convert_to_gray_scale(original_image)
+    outputImage = applyPreprocessing(grayscale_image)
+    greyFilename = write_grayscale_image(outputImage)
+    text = apply_ocr(greyFilename)
     print("***************************************")
     print(text)
     print("***************************************")
-    showIOImages(originalImage, grayscaleImage)
+    show_io_images(original_image, grayscale_image)
