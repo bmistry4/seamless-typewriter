@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
-
-cap = cv2.VideoCapture(r"D:\Videos\Banter\amnesia.mp4")
+videoPath = r"videos\mysql.mp4"
+cap = cv2.VideoCapture(videoPath)
 
 while cap.isOpened():
     ret, frame = cap.read()
