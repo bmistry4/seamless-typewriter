@@ -16,7 +16,7 @@ class VideoSearcher:
         self.word_to_timestamps = defaultdict(set)  # word -> set of ts values (ints)
         self.index_to_timestamp = {}  # index value of frame to int timestamp of the frame
 
-        self.timestamp_num = 0
+        self.timestamp_num = 0  # initial value
 
         self.populate_timestamp_structures(1)
 
@@ -30,13 +30,15 @@ class VideoSearcher:
         """
         For all frames in the video withing the sampling rate, get the text from the video and update the timestamp
         dicts
-        :param sampling_rate: The rate (seconds) at which to process a frame
-        :return: None
+
+        :param sampling_rate:
+            The rate (seconds) at which to process a frame
         """
         cap = cv2.VideoCapture(self.video_path)
         # frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
         previous_timestamp = 0  # Last added timestamp to the timestamp dicts
+        current_timestamp = 0
 
         while cap.isOpened():
             frame_exists, frame = cap.read()
@@ -64,13 +66,7 @@ class VideoSearcher:
 
                 previous_timestamp = current_timestamp
 
-                # If we want to display the frame
-                # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                # cv2.imshow('frame', gray)
-                # if cv2.waitKey(1) & 0xFF == ord('q'):
-                #     break
-
-            self.timestamp_num = current_timestamp
+        self.timestamp_num = current_timestamp
 
         cap.release()
         cv2.destroyAllWindows()
@@ -79,8 +75,10 @@ class VideoSearcher:
     def apply_ocr(image):
         """
         Given a frame, apply ocr and return the text
-        :param image: Frame
-        :return: extracted text from the image
+        :param image:
+            Frame
+        :return:
+            extracted text from the image
         """
         text = pytesseract.image_to_string(image)
         return text
