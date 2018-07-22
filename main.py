@@ -18,7 +18,7 @@ class VideoSearcher:
         self.word_to_timestamps = defaultdict(set)  # word -> set of ts values (ints)
 
         self.timestamp_num = 0  # initial value of total number of timestamps
-        self.video_length = 0   # initial value of length of video in seconds
+        self.video_length = 0.   # initial value of length of video in seconds
 
         self.populate_timestamp_structures(1)
 
@@ -40,13 +40,13 @@ class VideoSearcher:
         # frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
         previous_timestamp = 0  # Last added timestamp to the timestamp dicts
+        current_timestamp = 0
         current_index = 0
 
         while cap.isOpened():
             frame_exists, frame = cap.read()
 
             if not frame_exists:
-                self.video_length = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
                 break
 
             # Timestamp in ms for the frame relative to the start of the video
@@ -69,6 +69,7 @@ class VideoSearcher:
                 previous_timestamp = current_timestamp
 
         self.timestamp_num = current_timestamp
+        self.video_length = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
 
         cap.release()
         cv2.destroyAllWindows()
