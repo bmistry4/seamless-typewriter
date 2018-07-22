@@ -9,14 +9,14 @@ import math
 
 
 class VideoSearcher:
-    """
-    This class provides the data structures used to index and search for text in a video
-    """
+    """This class provides the data structures used to index and search for text in a video"""
 
     def __init__(self, video_path):
         self.video_path = video_path  # File path to video
         self.word_to_timestamps = defaultdict(set)  # word -> set of ts values (ints)
         self.index_to_timestamp = {}  # index value of frame to int timestamp of the frame
+
+        self.timestamp_num = 0
 
         self.populate_timestamp_structures(1)
 
@@ -70,10 +70,13 @@ class VideoSearcher:
                 # if cv2.waitKey(1) & 0xFF == ord('q'):
                 #     break
 
+            self.timestamp_num = current_timestamp
+
         cap.release()
         cv2.destroyAllWindows()
 
-    def apply_ocr(self, image):
+    @staticmethod
+    def apply_ocr(image):
         """
         Given a frame, apply ocr and return the text
         :param image: Frame
@@ -82,31 +85,30 @@ class VideoSearcher:
         text = pytesseract.image_to_string(image)
         return text
 
+    def get_timestamps(self, phrase):
+        """
+        Given a phrase, returns all timestamps to frames of the video that may contain the phrase, ranked in order of
+        likelihood
 
-def get_timestamps(phrase):
-    """
-    Given a phrase, returns all timestamps to frames of the video that may contain the phrase, ranked in order of
-    likelihood
+        :param phrase:
+            a string with one or more words
+        :return:
+            numpy array of timestamps as ints, with the best results first
+        """
+        timestamp_counts = np.zeros(self.timestamp_num)
 
-    :param phrase:
-        a string with one or more words
-    :return:
-        numpy array of timestamps as ints, with the best results first
-    """
-    timestamp_counts = np.zeros(self.timestamp_num)
+        words = phrase.split(" ")
+        for word in words:
+            timestamp_set = self.word_to_timestamps[word]
+            for timestamp in timestamp_set:
+                timestamp_counts[timestamp] += 1
 
-    words = phrase.split(" ")
-    for word in words:
-        timestamp_set = self.word_to_timestamps[word]
-        for timestamp in timestamp_set:
-            timestamp_counts[timestamp] += 1
+        # clever trick - indices of array are equal to their equivalent timestamps
+        timestamp_counts = np.argsort(timestamp_counts)
+        # reverse array so in descending order
+        timestamp_counts = timestamp_counts[::-1]
 
-    # clever trick - indices of array are equal to their equivalent timestamps
-    timestamp_counts = np.argsort(timestamp_counts)
-    # reverse array so in descending order
-    timestamp_counts = timestamp_counts[::-1]
-
-    return timestamp_counts
+        return timestamp_counts
 
 
 if __name__ == '__main__':
