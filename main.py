@@ -6,7 +6,7 @@ from PIL import Image
 from pytesseract import pytesseract
 from collections import defaultdict
 import math
-import re
+import re, string
 
 class VideoSearcher:
     """
@@ -41,6 +41,7 @@ class VideoSearcher:
 
         previous_timestamp = 0  # Last added timestamp to the timestamp dicts
         current_index = 0
+        regex = re.compile('[%s]' % re.escape(string.punctuation))
 
         while cap.isOpened():
             frame_exists, frame = cap.read()
@@ -64,7 +65,9 @@ class VideoSearcher:
 
                 # Populate the word-timestamp dicts
                 for w in words:
-                    self.word_to_timestamps[w].add(current_index)
+                    w = regex.sub('', w.lower())
+                    if w != "":
+                        self.word_to_timestamps[w].add(current_index)
 
                 current_index += 1
                 previous_timestamp = current_timestamp
