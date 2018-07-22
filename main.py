@@ -6,7 +6,7 @@ from PIL import Image
 from pytesseract import pytesseract
 from collections import defaultdict
 import math
-
+import re, string
 
 class VideoSearcher:
     """
@@ -42,6 +42,7 @@ class VideoSearcher:
         previous_timestamp = 0  # Last added timestamp to the timestamp dicts
         current_timestamp = 0
         current_index = 0
+        regex = re.compile('[%s]' % re.escape(string.punctuation))
 
         while cap.isOpened():
             frame_exists, frame = cap.read()
@@ -59,11 +60,14 @@ class VideoSearcher:
             if time_diff >= sampling_rate:
 
                 text = self.apply_ocr(frame)
-                words = text.split(" ")
+                # Split on new line and white spaces
+                words = re.split("\n|\\s", text)
 
                 # Populate the word-timestamp dicts
                 for w in words:
-                    self.word_to_timestamps[w].add(current_index)
+                    w = regex.sub('', w.lower())
+                    if w != "":
+                        self.word_to_timestamps[w].add(current_index)
 
                 current_index += 1
                 previous_timestamp = current_timestamp
@@ -109,7 +113,7 @@ class VideoSearcher:
         """
         timestamp_counts = np.zeros(self.timestamp_num)
 
-        words = phrase.split(" ")
+        words = phrase.split()
         for word in words:
             timestamp_set = self.word_to_timestamps[word]
             for timestamp in timestamp_set:
