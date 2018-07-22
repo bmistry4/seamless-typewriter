@@ -1,12 +1,16 @@
+import os
+
 import numpy as np
 import cv2
+from PIL import Image
+from pytesseract import pytesseract
+
 
 def read_video(video_path):
     cap = cv2.VideoCapture(video_path)
 
     while cap.isOpened():
         ret, frame = cap.read()
-
         if not ret:
             break
 
@@ -18,6 +22,12 @@ def read_video(video_path):
 
     cap.release()
     cv2.destroyAllWindows()
+
+
+def apply_ocr(image):
+    text = pytesseract.image_to_string(image)
+    return text
+
 
 if __name__ == '__main__':
     video_path = r"videos\mysql.mp4"

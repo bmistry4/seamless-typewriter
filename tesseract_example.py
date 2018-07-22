@@ -7,17 +7,12 @@ import os
 
 
 # construct the argument parse and parse the arguments
-def parse_args():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--image", required=True,
-                    help="path to input image to be OCR'd")
-    ap.add_argument("-p", "--preprocess", type=str, default="thresh",
-                    help="type of preprocessing to be done")
-    args = vars(ap.parse_args())
-    return args
-
-
-args = parse_args()
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--image", required=True,
+                help="path to input image to be OCR'd")
+ap.add_argument("-p", "--preprocess", type=str, default="thresh",
+                help="type of preprocessing to be done")
+args = vars(ap.parse_args())
 
 
 def get_original_image():
@@ -30,7 +25,7 @@ def convert_to_gray_scale(image):
     return gray
 
 
-def applyPreprocessing(image):
+def apply_preprocessing(image):
     # check to see if we should apply thresholding to preprocess the
     # image
     if args["preprocess"] == "thresh":
@@ -45,11 +40,15 @@ def applyPreprocessing(image):
     return image
 
 
-def write_grayscale_image(grayImage):
-    # write the grayscale image to disk as a temporary file so we can
-    # apply OCR to it
+def write_grayscale_image(gray_image):
+    """
+    write the grayscale image to disk as a temporary file so we can apply OCR to it
+    
+    :param gray_image: 
+    :return: 
+    """
     filename = "{}.png".format(os.getpid())
-    cv2.imwrite(filename, grayImage)
+    cv2.imwrite(filename, gray_image)
     return filename
 
 
@@ -72,7 +71,7 @@ def show_io_images(input, output):
 if __name__ == '__main__':
     original_image = get_original_image()
     grayscale_image = convert_to_gray_scale(original_image)
-    outputImage = applyPreprocessing(grayscale_image)
+    outputImage = apply_preprocessing(grayscale_image)
     greyFilename = write_grayscale_image(outputImage)
     text = apply_ocr(greyFilename)
     print("***************************************")
