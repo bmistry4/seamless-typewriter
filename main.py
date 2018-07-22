@@ -4,31 +4,85 @@ import numpy as np
 import cv2
 from PIL import Image
 from pytesseract import pytesseract
+from collections import defaultdict
+import math
 
 
-def read_video(video_path):
-    cap = cv2.VideoCapture(video_path)
+class VideoSearcher:
+    """
+    This class provides the data structures used to index and search for text in a video
+    """
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
+    def __init__(self, video_path):
+        self.video_path = video_path  # File path to video
+        self.word_to_timestamps = defaultdict(set)  # word -> set of ts values (ints)
+        self.index_to_timestamp = {}  # index value of frame to int timestamp of the frame
 
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        self.populate_timestamp_structures(1)
 
-        cv2.imshow('frame', gray)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # TODO - remove after
+        print(self.word_to_timestamps)
+        print()
+        print(self.index_to_timestamp)
+        print("Words", self.word_to_timestamps.keys())
 
-    cap.release()
-    cv2.destroyAllWindows()
+    def populate_timestamp_structures(self, sampling_rate):
+        """
+        For all frames in the video withing the sampling rate, get the text from the video and update the timestamp
+        dicts
+        :param sampling_rate: The rate (seconds) at which to process a frame
+        :return: None
+        """
+        cap = cv2.VideoCapture(self.video_path)
+        # frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
+        previous_timestamp = 0  # Last added timestamp to the timestamp dicts
 
-def apply_ocr(image):
-    text = pytesseract.image_to_string(image)
-    return text
+        while cap.isOpened():
+            frame_exists, frame = cap.read()
+
+            if not frame_exists:
+                break
+
+            # Timestamp in ms for the frame relative to the start of the video
+            current_timestamp = cap.get(cv2.CAP_PROP_POS_MSEC)
+            # Convert to seconds 0.d.p
+            current_timestamp = math.floor(current_timestamp / 1000)
+
+            time_diff = current_timestamp - previous_timestamp
+            # Only process if within the given sampling rate
+            if time_diff >= sampling_rate:
+
+                text = self.apply_ocr(frame)
+                words = text.split(" ")
+
+                for w in words:
+                    self.word_to_timestamps[w].add(current_timestamp)
+
+                    frame_pos = cap.get(cv2.CAP_PROP_POS_FRAMES)
+                    self.index_to_timestamp[int(frame_pos)] = current_timestamp
+
+                previous_timestamp = current_timestamp
+
+                # If we want to display the frame
+                # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                # cv2.imshow('frame', gray)
+                # if cv2.waitKey(1) & 0xFF == ord('q'):
+                #     break
+
+        cap.release()
+        cv2.destroyAllWindows()
+
+    def apply_ocr(self, image):
+        """
+        Given a frame, apply ocr and return the text
+        :param image: Frame
+        :return: extracted text from the image
+        """
+        text = pytesseract.image_to_string(image)
+        return text
 
 
 if __name__ == '__main__':
     video_path = r"videos\mysql.mp4"
-    read_video(video_path)
+    VideoSearcher(video_path=video_path)
