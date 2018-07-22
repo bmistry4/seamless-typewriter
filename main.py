@@ -17,7 +17,8 @@ class VideoSearcher:
         self.video_path = video_path  # File path to video
         self.word_to_timestamps = defaultdict(set)  # word -> set of ts values (ints)
 
-        self.timestamp_num = 0  # initial value
+        self.timestamp_num = 0  # initial value of total number of timestamps
+        self.video_length = 0   # initial value of length of video in seconds
 
         self.populate_timestamp_structures(1)
 
@@ -45,6 +46,7 @@ class VideoSearcher:
             frame_exists, frame = cap.read()
 
             if not frame_exists:
+                self.video_length = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
                 break
 
             # Timestamp in ms for the frame relative to the start of the video
@@ -71,6 +73,17 @@ class VideoSearcher:
 
         cap.release()
         cv2.destroyAllWindows()
+
+    def timestamp_index_to_seconds(self, index):
+        """
+        Converts a timestamp index to its corresponding time in the video in seconds
+
+        :param index:
+            integer representing the timestamp index
+        :return:
+            integer representing the seconds in the video specified by the timestamp index
+        """
+        return math.floor(self.video_length * index / self.timestamp_num)
 
     @staticmethod
     def apply_ocr(image):
