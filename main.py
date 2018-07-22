@@ -10,33 +10,34 @@ import math
 
 class VideoSearcher:
     """
-    This class provides the data structures used to index and search for text in a video
+        This class provides the data structures used to index and search for text in a video
     """
 
     def __init__(self, video_path):
         self.video_path = video_path  # File path to video
         self.word_to_timestamps = defaultdict(set)  # word -> set of ts values (ints)
-        self.index_to_timestamp = {}  # index value of frame to int timestamp of the frame
 
         self.populate_timestamp_structures(1)
 
         # TODO - remove after
         print(self.word_to_timestamps)
         print()
-        print(self.index_to_timestamp)
         print("Words", self.word_to_timestamps.keys())
 
     def populate_timestamp_structures(self, sampling_rate):
         """
         For all frames in the video withing the sampling rate, get the text from the video and update the timestamp
         dicts
-        :param sampling_rate: The rate (seconds) at which to process a frame
-        :return: None
+        :param sampling_rate:
+            The rate (seconds) at which to process a frame
+        :return:
+            None
         """
         cap = cv2.VideoCapture(self.video_path)
         # frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
         previous_timestamp = 0  # Last added timestamp to the timestamp dicts
+        current_index = 0
 
         while cap.isOpened():
             frame_exists, frame = cap.read()
@@ -56,12 +57,11 @@ class VideoSearcher:
                 text = self.apply_ocr(frame)
                 words = text.split(" ")
 
+                # Populate the word-timestamp dicts
                 for w in words:
-                    self.word_to_timestamps[w].add(current_timestamp)
+                    self.word_to_timestamps[w].add(current_index)
 
-                    frame_pos = cap.get(cv2.CAP_PROP_POS_FRAMES)
-                    self.index_to_timestamp[int(frame_pos)] = current_timestamp
-
+                current_index += 1
                 previous_timestamp = current_timestamp
 
                 # If we want to display the frame
@@ -76,8 +76,10 @@ class VideoSearcher:
     def apply_ocr(self, image):
         """
         Given a frame, apply ocr and return the text
-        :param image: Frame
-        :return: extracted text from the image
+        :param image:
+            Frame
+        :return:
+            Extracted text from the image
         """
         text = pytesseract.image_to_string(image)
         return text
