@@ -83,6 +83,32 @@ class VideoSearcher:
         return text
 
 
+def get_timestamps(phrase):
+    """
+    Given a phrase, returns all timestamps to frames of the video that may contain the phrase, ranked in order of
+    likelihood
+
+    :param phrase:
+        a string with one or more words
+    :return:
+        numpy array of timestamps as ints, with the best results first
+    """
+    timestamp_counts = np.zeros(self.timestamp_num)
+
+    words = phrase.split(" ")
+    for word in words:
+        timestamp_set = self.word_to_timestamps[word]
+        for timestamp in timestamp_set:
+            timestamp_counts[timestamp] += 1
+
+    # clever trick - indices of array are equal to their equivalent timestamps
+    timestamp_counts = np.argsort(timestamp_counts)
+    # reverse array so in descending order
+    timestamp_counts = timestamp_counts[::-1]
+
+    return timestamp_counts
+
+
 if __name__ == '__main__':
     video_path = r"videos\mysql.mp4"
     VideoSearcher(video_path=video_path)
