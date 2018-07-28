@@ -1,35 +1,37 @@
 import os
-import tkinter as tk
+import tkinter as Tk
 from tkinter.constants import *
 from tkinter.ttk import Frame, Label, Button
 
 from view.video_frame import VideoFrame
+from view.video_events import Events
 
 
-class MainFrame(tk.Tk):
-    def __init__(self):
+class MainFrame(Frame):
+    def __init__(self, root_Tk):
+        self.root_Tk = root_Tk
 
-        tk.Tk.__init__(self)
+        Frame.__init__(self, root_Tk, width=800, height=600)
 
-        self.root = tk.Frame(self, width=800, height=600)
-        self.root.pack(side="top", fill="both", expand=True)
-        self.winfo_toplevel().title("TITLE")
-        self.protocol("WM_DELETE_WINDOW", self._quit)
-        leftFrame = Frame(self.root)
-        rightFrame = Frame(self.root)
+        self.event_handler = Events(self)
+        self.pack(side="top", fill="both", expand=True)
+        leftFrame = Frame(self)
+        rightFrame = Frame(self)
 
         leftFrame.pack(side=LEFT)
         rightFrame.pack(side=RIGHT)
 
+        self.generate_menubar(root_Tk)
         self.generate_browse_and_search(rightFrame)
         self.generate_video(rightFrame)
 
-    def _quit(self):
-        print("_quit: bye")
-        self.quit()  # stops mainloop
-        self.destroy()  # this is necessary on Windows to prevent
-        # Fatal Python Error: PyEval_RestoreThread: NULL tstate
-        os._exit(1)
+    def generate_menubar(self, parent):
+        menubar = Tk.Menu(parent)
+        parent.config(menu=menubar)
+
+        file_menu = Tk.Menu(menubar)
+        file_menu.add_command(label="Open", underline=0, command=self.event_handler.OnOpen)
+        menubar.add_cascade(label="File", menu=file_menu)
 
     def generate_browse_and_search(self, parent):
         sub_frame = Frame(parent)
@@ -41,13 +43,9 @@ class MainFrame(tk.Tk):
         path_label.grid(row=0,column=1)
 
     def generate_video(self, parent):
-        video = VideoFrame(parent)
+        video = VideoFrame(parent, self.event_handler)
         video.pack()
         video.pack(fill=X)
 
-
     def on_dummy(self):
         print("Clicked on something")
-
-view = MainFrame()
-view.mainloop()
