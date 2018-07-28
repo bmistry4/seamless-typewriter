@@ -1,21 +1,5 @@
-import vlc
-import sys
-
-if sys.version_info[0] < 3:
-    import Tkinter as Tk
-    from tkinter import ttk
-    from tkinter.filedialog import askopenfilename
-else:
-    import tkinter as Tk
-    from tkinter import ttk
-    from tkinter.filedialog import askopenfilename
-
 # import standard libraries
-import os
-import pathlib
-from threading import Timer, Thread, Event
-import time
-import platform
+from threading import Thread, Event
 
 
 class TkkTimer(Thread):

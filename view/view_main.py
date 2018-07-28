@@ -31,4 +31,5 @@ class ViewMain:
         os._exit(1)
 
 
-ViewMain()
+if __name__ == '__main__':
+    ViewMain()

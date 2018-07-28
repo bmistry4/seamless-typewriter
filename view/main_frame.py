@@ -22,10 +22,10 @@ class MainFrame(Frame):
         leftFrame = Frame(self)
         rightFrame = Frame(self)
 
-        leftFrame.pack(side=LEFT)
+        leftFrame.pack(side=LEFT,)
         rightFrame.pack(side=RIGHT)
 
-        search_panel = SearchFrame(leftFrame)
+        search_panel = SearchFrame(leftFrame, self.event_handler)
         search_panel.pack()
 
         self.generate_menubar(root_Tk)

@@ -23,10 +23,10 @@ class VideoFrame(Tk.Frame):
         self.generate_video_panel(video_panel)
 
         video_control_panel = ttk.Frame(self.parent)
-        self.generate_control_panel(video_control_panel)
+        volume_slider = self.generate_control_panel(video_control_panel)
 
         time_slider_panel = ttk.Frame(self.parent)
-        self.generate_time_slider(time_slider_panel)
+        time_slider = self.generate_time_slider(time_slider_panel)
 
         self.begin_timer()
         self.parent.update()
@@ -34,9 +34,9 @@ class VideoFrame(Tk.Frame):
         # self.player.set_hwnd(self.GetHandle()) # for windows, OnOpen does does this
 
         # set in events handler
-        self.event_handler.videopanel = video_panel
-        self.event_handler.volslider = self.volslider
-        self.event_handler.timeslider = self.timeslider
+        self.event_handler._video_panel = video_panel
+        self.event_handler._volume_slider = volume_slider
+        self.event_handler._time_slider = time_slider
         
         # Deal with layout of sub-frames (containers)
         video_panel.pack(fill=Tk.BOTH, expand=1)
@@ -59,15 +59,17 @@ class VideoFrame(Tk.Frame):
         stop.pack(side=Tk.LEFT)
         volume.pack(side=Tk.LEFT)
 
-        self.volslider = Tk.Scale(parent, variable=self.event_handler.volume_var,
+        volslider = Tk.Scale(parent, variable=self.event_handler.volume_var,
                                   command=self.event_handler.volume_sel,
                                   from_=0, to=100, orient=Tk.HORIZONTAL, length=100)
-        self.volslider.pack(side=Tk.LEFT)
+        volslider.pack(side=Tk.LEFT)
+        return volslider
 
     def generate_time_slider(self, parent):
-        self.timeslider = Tk.Scale(parent, variable=self.event_handler.scale_var, command=self.event_handler.scale_sel,
+        timeslider = Tk.Scale(parent, variable=self.event_handler.scale_var, command=self.event_handler.scale_sel,
                                    from_=0, to=1000, orient=Tk.HORIZONTAL, length=500)
-        self.timeslider.pack(side=Tk.BOTTOM, fill=Tk.X, expand=1)
+        timeslider.pack(side=Tk.BOTTOM, fill=Tk.X, expand=1)
+        return timeslider
 
     def begin_timer(self):
         self.timer = TkkTimer(self.event_handler.on_timer, 1.0)

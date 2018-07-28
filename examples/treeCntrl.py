@@ -10,7 +10,6 @@ except ImportError:  # Python 3
     import tkinter as tk
     import tkinter.font as tkFont
     import tkinter.ttk as ttk
-    from tkinter import Message
 
 class MultiColumnListbox(object):
     """use a ttk.TreeView as a multicolumn ListBox"""
@@ -58,7 +57,6 @@ to change width of column drag boundary
                 col_w = tkFont.Font().measure(val)
                 if self.tree.column(car_header[ix],width=None)<col_w:
                     self.tree.column(car_header[ix], width=col_w)
-        self.tree.insert('','end', values=(Message(self.tree, text="this is a message"), "Tet"))
 
 def sortby(tree, col, descending):
     """sort tree contents when a column header is clicked on"""

@@ -13,15 +13,15 @@ class Events:
     def __init__(self, parent_frame):
         self.parent_frame = parent_frame
 
-        self.player = None
-        self.videopanel  = None
-        self.volslider = None
-        self.timeslider = None
+        self._player = None
+        self._video_panel  = None
+        self._volume_slider = None
+        self._time_slider = None
 
 
         # VLC player controls
         self.video_instance = vlc.Instance()
-        self.player = self.video_instance.media_player_new()
+        self._player = self.video_instance.media_player_new()
 
         self.volume_var = Tk.IntVar()
 
@@ -54,10 +54,10 @@ class Events:
             filename = os.path.basename(fullname)
             # Creation
             self.Media = self.video_instance.media_new(str(os.path.join(dirname, filename)))
-            self.player.set_media(self.Media)
+            self._player.set_media(self.Media)
 
             # Report the title of the file chosen
-            title = self.player.get_title()
+            title = self._player.get_title()
             #  if an error was encountred while retriving the title, then use  filename
             if title == -1:
                title = filename
@@ -66,15 +66,15 @@ class Events:
 
             # set the window id where to render VLC's video output
             if platform.system() == 'Windows':
-                self.player.set_hwnd(self.get_handle())
+                self._player.set_hwnd(self.get_handle())
             else:
-                self.player.set_xwindow(self.get_handle())  # this line messes up windows
+                self._player.set_xwindow(self.get_handle())  # this line messes up windows
             # FIXME: this should be made cross-platform
             self.on_play()
 
             # set the volume slider to the current volume
             # self.volslider.SetValue(self.player.audio_get_volume() / 2)
-            self.volslider.set(self.player.audio_get_volume())
+            self._volume_slider.set(self._player.audio_get_volume())
 
     def on_play(self):
         """Toggle the status to Play/Pause.
@@ -82,42 +82,42 @@ class Events:
         """
         # check if there is a file to play, otherwise open a
         # Tk.FileDialog to select a file
-        if not self.player.get_media():
+        if not self._player.get_media():
             self.on_open()
         else:
             # Try to launch the media, if this fails display an error message
-            if self.player.play() == -1:
+            if self._player.play() == -1:
                 self.display_error("Unable to play.")
 
     def get_handle(self):
-        return self.videopanel.winfo_id()
+        return self._video_panel.winfo_id()
 
     # def OnPause(self, evt):
     def on_pause(self):
         """Pause the player.
         """
-        self.player.pause()
+        self._player.pause()
 
     def on_stop(self):
         """Stop the player.
         """
-        self.player.stop()
+        self._player.stop()
         # reset the time slider
-        self.timeslider.set(0)
+        self._time_slider.set(0)
 
     def on_timer(self):
         """Update the time slider according to the current movie time.
         """
-        if self.player == None:
+        if self._player == None:
             return
         # since the self.player.get_length can change while playing,
         # re-set the timeslider to the correct range.
-        length = self.player.get_length()
+        length = self._player.get_length()
         dbl = length * 0.001
-        self.timeslider.config(to=dbl)
+        self._time_slider.config(to=dbl)
 
         # update the time on the slider
-        tyme = self.player.get_time()
+        tyme = self._player.get_time()
         if tyme == -1:
             tyme = 0
         dbl = tyme * 0.001
@@ -125,10 +125,10 @@ class Events:
         # don't want to programatically change slider while user is messing with it.
         # wait 2 seconds after user lets go of slider
         if time.time() > (self.timeslider_last_update + 2.0):
-            self.timeslider.set(dbl)
+            self._time_slider.set(dbl)
 
     def scale_sel(self, evt):
-        if self.player == None:
+        if self._player == None:
             return
         nval = self.scale_var.get()
         sval = str(nval)
@@ -149,28 +149,29 @@ class Events:
             # selection = "Value, last = " + sval + " " + str(self.timeslider_last_val)
             # print("selection= ", selection)
             self.timeslider_last_update = time.time()
+
             mval = "%.0f" % (nval * 1000)
-            self.player.set_time(int(mval))  # expects milliseconds
+            self._player.set_time(int(mval))  # expects milliseconds
 
     def volume_sel(self, evt):
-        if self.player == None:
+        if self._player == None:
             return
         volume = self.volume_var.get()
         if volume > 100:
             volume = 100
-        if self.player.audio_set_volume(volume) == -1:
+        if self._player.audio_set_volume(volume) == -1:
             self.display_error("Failed to set volume")
 
     def on_toggle_volume(self, evt):
         """Mute/Unmute according to the audio button.
         """
-        is_mute = self.player.audio_get_mute()
+        is_mute = self._player.audio_get_mute()
 
-        self.player.audio_set_mute(not is_mute)
+        self._player.audio_set_mute(not is_mute)
         # update the volume slider;
         # since vlc volume range is in [0, 200],
         # and our volume slider has range [0, 100], just divide by 2.
-        self.volume_var.set(self.player.audio_get_volume())
+        self.volume_var.set(self._player.audio_get_volume())
 
     def on_set_volume(self):
         """Set the volume according to the volume sider.
@@ -181,7 +182,7 @@ class Events:
         # vlc.MediaPlayer.audio_set_volume returns 0 if success, -1 otherwise
         if volume > 100:
             volume = 100
-        if self.player.audio_set_volume(volume) == -1:
+        if self._player.audio_set_volume(volume) == -1:
             self.display_error("Failed to set volume")
 
     def display_error(self, errormessage):
