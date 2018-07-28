@@ -19,42 +19,56 @@ class VideoFrame(Tk.Frame):
         self.parent = parent
         self.event_handler = event_handler
 
-        # The second panel holds controls
-        # self.player = None
-        self.videopanel = ttk.Frame(self.parent)
-        self.canvas = Tk.Canvas(self.videopanel).pack(fill=Tk.BOTH, expand=1)
-        self.videopanel.pack(fill=Tk.BOTH, expand=1)
+        video_panel = ttk.Frame(self.parent)
+        self.generate_video_panel(video_panel)
 
-        ctrlpanel = ttk.Frame(self.parent)
-        pause = ttk.Button(ctrlpanel, text="Pause", command=self.event_handler.OnPause)
-        play = ttk.Button(ctrlpanel, text="Play", command=self.event_handler.OnPlay)
-        stop = ttk.Button(ctrlpanel, text="Stop", command=self.event_handler.OnStop)
-        volume = ttk.Button(ctrlpanel, text="Volume", command=self.event_handler.OnSetVolume)
+        video_control_panel = ttk.Frame(self.parent)
+        self.generate_control_panel(video_control_panel)
+
+        time_slider_panel = ttk.Frame(self.parent)
+        self.generate_time_slider(time_slider_panel)
+
+        self.begin_timer()
+        self.parent.update()
+
+        # self.player.set_hwnd(self.GetHandle()) # for windows, OnOpen does does this
+
+        # set in events handler
+        self.event_handler.videopanel = video_panel
+        self.event_handler.volslider = self.volslider
+        self.event_handler.timeslider = self.timeslider
+        
+        # Deal with layout of sub-frames (containers)
+        video_panel.pack(fill=Tk.BOTH, expand=1)
+        video_control_panel.pack(side=Tk.BOTTOM)
+        time_slider_panel.pack(side=Tk.BOTTOM, fill=Tk.X)
+
+
+    def generate_video_panel(self, parent):
+        canvas = Tk.Canvas(parent)
+        canvas.pack(fill=Tk.BOTH, expand=1)
+    
+    def generate_control_panel(self, parent):
+        pause = ttk.Button(parent, text="Pause", command=self.event_handler.on_pause)
+        play = ttk.Button(parent, text="Play", command=self.event_handler.on_play)
+        stop = ttk.Button(parent, text="Stop", command=self.event_handler.on_stop)
+        volume = ttk.Button(parent, text="Volume", command=self.event_handler.on_set_volume)
+
         pause.pack(side=Tk.LEFT)
         play.pack(side=Tk.LEFT)
         stop.pack(side=Tk.LEFT)
         volume.pack(side=Tk.LEFT)
 
-        self.volslider = Tk.Scale(ctrlpanel, variable=self.event_handler.volume_var, command=self.event_handler.volume_sel,
+        self.volslider = Tk.Scale(parent, variable=self.event_handler.volume_var,
+                                  command=self.event_handler.volume_sel,
                                   from_=0, to=100, orient=Tk.HORIZONTAL, length=100)
         self.volslider.pack(side=Tk.LEFT)
-        ctrlpanel.pack(side=Tk.BOTTOM)
 
-        ctrlpanel2 = ttk.Frame(self.parent)
-        self.timeslider = Tk.Scale(ctrlpanel2, variable=self.event_handler.scale_var, command=self.event_handler.scale_sel,
+    def generate_time_slider(self, parent):
+        self.timeslider = Tk.Scale(parent, variable=self.event_handler.scale_var, command=self.event_handler.scale_sel,
                                    from_=0, to=1000, orient=Tk.HORIZONTAL, length=500)
         self.timeslider.pack(side=Tk.BOTTOM, fill=Tk.X, expand=1)
 
-        ctrlpanel2.pack(side=Tk.BOTTOM, fill=Tk.X)
-
-
-        self.timer = TkkTimer(self.event_handler.OnTimer, 1.0)
+    def begin_timer(self):
+        self.timer = TkkTimer(self.event_handler.on_timer, 1.0)
         self.timer.start()
-        self.parent.update()
-
-        # self.player.set_hwnd(self.GetHandle()) # for windows, OnOpen does does this
-        
-        self.event_handler.videopanel = self.videopanel
-        self.event_handler.volslider = self.volslider # set in events handler
-        self.event_handler.timeslider = self.timeslider #set in event handler
-

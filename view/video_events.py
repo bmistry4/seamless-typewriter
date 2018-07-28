@@ -15,32 +15,32 @@ class Events:
 
         self.player = None
         self.videopanel  = None
+        self.volslider = None
+        self.timeslider = None
+
 
         # VLC player controls
-        self.Instance = vlc.Instance()
-        self.player = self.Instance.media_player_new()
+        self.video_instance = vlc.Instance()
+        self.player = self.video_instance.media_player_new()
 
         self.volume_var = Tk.IntVar()
-        self.volslider = None
 
+        # Time slider variables
         self.scale_var = Tk.DoubleVar()
         self.timeslider_last_val = ""
-        self.timeslider = None
         self.timeslider_last_update = time.time()
 
 
-
-
-    def OnExit(self, evt):
+    def on_exit(self, evt):
         """Closes the window.
         """
         self.Close()
 
-    def OnOpen(self):
+    def on_open(self):
         """Pop up a new dialow window to choose a file, then play the selected file.
         """
         # if a file is already running, then stop it.
-        self.OnStop()
+        self.on_stop()
 
         # Create a file dialog opened in the current home directory, where
         # you can display all kind of files, having as title "Choose a file".
@@ -53,58 +53,59 @@ class Events:
             dirname = os.path.dirname(fullname)
             filename = os.path.basename(fullname)
             # Creation
-            self.Media = self.Instance.media_new(str(os.path.join(dirname, filename)))
+            self.Media = self.video_instance.media_new(str(os.path.join(dirname, filename)))
             self.player.set_media(self.Media)
+
             # Report the title of the file chosen
-            # title = self.player.get_title()
-            #  if an error was encountred while retriving the title, then use
-            #  filename
-            # if title == -1:
-            #    title = filename
-            # self.SetTitle("%s - tkVLCplayer" % title)
+            title = self.player.get_title()
+            #  if an error was encountred while retriving the title, then use  filename
+            if title == -1:
+               title = filename
+
+            self.parent_frame.update_status_bar(title)
 
             # set the window id where to render VLC's video output
             if platform.system() == 'Windows':
-                self.player.set_hwnd(self.GetHandle())
+                self.player.set_hwnd(self.get_handle())
             else:
-                self.player.set_xwindow(self.GetHandle())  # this line messes up windows
+                self.player.set_xwindow(self.get_handle())  # this line messes up windows
             # FIXME: this should be made cross-platform
-            self.OnPlay()
+            self.on_play()
 
             # set the volume slider to the current volume
             # self.volslider.SetValue(self.player.audio_get_volume() / 2)
             self.volslider.set(self.player.audio_get_volume())
 
-    def OnPlay(self):
+    def on_play(self):
         """Toggle the status to Play/Pause.
         If no file is loaded, open the dialog window.
         """
         # check if there is a file to play, otherwise open a
         # Tk.FileDialog to select a file
         if not self.player.get_media():
-            self.OnOpen()
+            self.on_open()
         else:
             # Try to launch the media, if this fails display an error message
             if self.player.play() == -1:
-                self.errorDialog("Unable to play.")
+                self.display_error("Unable to play.")
 
-    def GetHandle(self):
+    def get_handle(self):
         return self.videopanel.winfo_id()
 
     # def OnPause(self, evt):
-    def OnPause(self):
+    def on_pause(self):
         """Pause the player.
         """
         self.player.pause()
 
-    def OnStop(self):
+    def on_stop(self):
         """Stop the player.
         """
         self.player.stop()
         # reset the time slider
         self.timeslider.set(0)
 
-    def OnTimer(self):
+    def on_timer(self):
         """Update the time slider according to the current movie time.
         """
         if self.player == None:
@@ -158,9 +159,9 @@ class Events:
         if volume > 100:
             volume = 100
         if self.player.audio_set_volume(volume) == -1:
-            self.errorDialog("Failed to set volume")
+            self.display_error("Failed to set volume")
 
-    def OnToggleVolume(self, evt):
+    def on_toggle_volume(self, evt):
         """Mute/Unmute according to the audio button.
         """
         is_mute = self.player.audio_get_mute()
@@ -171,7 +172,7 @@ class Events:
         # and our volume slider has range [0, 100], just divide by 2.
         self.volume_var.set(self.player.audio_get_volume())
 
-    def OnSetVolume(self):
+    def on_set_volume(self):
         """Set the volume according to the volume sider.
         """
         volume = self.volume_var.get()
@@ -181,9 +182,9 @@ class Events:
         if volume > 100:
             volume = 100
         if self.player.audio_set_volume(volume) == -1:
-            self.errorDialog("Failed to set volume")
+            self.display_error("Failed to set volume")
 
-    def errorDialog(self, errormessage):
+    def display_error(self, errormessage):
         """Display a simple error dialog.
         """
         edialog = messagebox.showerror(self, 'Error '+ errormessage)

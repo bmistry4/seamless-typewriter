@@ -4,12 +4,13 @@ import os
 
 
 class ViewMain:
-    def __init__(self):
+    def __init__(self, title="Seamless Typewriter"):
         # Create a Tk.App(), which handles the windowing system event loop
         self.root = self.Tk_get_root()
+
         self.root.protocol("WM_DELETE_WINDOW", self._quit)
-        self.root.winfo_toplevel().title("TITLE")
-        self.root.protocol("WM_DELETE_WINDOW", self._quit)
+        self.root.winfo_toplevel().title(title)
+        # self.root.protocol("WM_DELETE_WINDOW", self._quit)
 
         MainFrame(self.root)
 
