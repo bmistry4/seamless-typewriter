@@ -124,6 +124,8 @@ class VideoSearcher:
         # reverse array so in descending order
         timestamp_counts = timestamp_counts[::-1]
 
+        timestamp_counts = np.where(timestamp_counts > 0)
+
         return timestamp_counts
 
 
