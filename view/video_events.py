@@ -1,23 +1,22 @@
 import os
 import pathlib
-from tkinter import filedialog
-from tkinter.filedialog import askopenfilename
 import platform
 import time
-import vlc
 import tkinter as Tk
 from tkinter import messagebox
+from tkinter.filedialog import askopenfilename
+
+import vlc
+
 
 class Events:
-
     def __init__(self, parent_frame):
         self.parent_frame = parent_frame
 
         self._player = None
-        self._video_panel  = None
+        self._video_panel = None
         self._volume_slider = None
         self._time_slider = None
-
 
         # VLC player controls
         self.video_instance = vlc.Instance()
@@ -30,26 +29,21 @@ class Events:
         self.timeslider_last_val = ""
         self.timeslider_last_update = time.time()
 
-
     def on_exit(self, evt):
-        """Closes the window.
-        """
+        """Closes the window"""
         self.Close()
 
     def on_open(self):
-        """Pop up a new dialow window to choose a file, then play the selected file.
-        """
+        """Pop up a new dialow window to choose a file, then play the selected file"""
         # if a file is already running, then stop it.
         self.on_stop()
 
         # Create a file dialog opened in the current home directory, where
         # you can display all kind of files, having as title "Choose a file".
         p = pathlib.Path(os.path.expanduser("~"))
-        fullname = askopenfilename(initialdir=p, title="choose your file",
+        fullname = askopenfilename(initialdir=p, title="Choose your file",
                                    filetypes=(("all files", "*.*"), ("mp4 files", "*.mp4")))
         if os.path.isfile(fullname):
-            print(fullname)
-            splt = os.path.split(fullname)
             dirname = os.path.dirname(fullname)
             filename = os.path.basename(fullname)
             # Creation
@@ -60,7 +54,7 @@ class Events:
             title = self._player.get_title()
             #  if an error was encountred while retriving the title, then use  filename
             if title == -1:
-               title = filename
+                title = filename
 
             self.parent_frame.update_status_bar(title)
 
@@ -94,21 +88,18 @@ class Events:
 
     # def OnPause(self, evt):
     def on_pause(self):
-        """Pause the player.
-        """
+        """Pause the player"""
         self._player.pause()
 
     def on_stop(self):
-        """Stop the player.
-        """
+        """Stop the player"""
         self._player.stop()
         # reset the time slider
         self._time_slider.set(0)
 
     def on_timer(self):
-        """Update the time slider according to the current movie time.
-        """
-        if self._player == None:
+        """Update the time slider according to the current movie time"""
+        if self._player is None:
             return
         # since the self.player.get_length can change while playing,
         # re-set the timeslider to the correct range.
@@ -122,13 +113,13 @@ class Events:
             tyme = 0
         dbl = tyme * 0.001
         self.timeslider_last_val = ("%.0f" % dbl) + ".0"
-        # don't want to programatically change slider while user is messing with it.
+        # don't want to programmatically change slider while user is messing with it.
         # wait 2 seconds after user lets go of slider
         if time.time() > (self.timeslider_last_update + 2.0):
             self._time_slider.set(dbl)
 
     def scale_sel(self, evt):
-        if self._player == None:
+        if self._player is None:
             return
         nval = self.scale_var.get()
         sval = str(nval)
@@ -154,7 +145,7 @@ class Events:
             self._player.set_time(int(mval))  # expects milliseconds
 
     def volume_sel(self, evt):
-        if self._player == None:
+        if self._player is None:
             return
         volume = self.volume_var.get()
         if volume > 100:
@@ -163,8 +154,7 @@ class Events:
             self.display_error("Failed to set volume")
 
     def on_toggle_volume(self, evt):
-        """Mute/Unmute according to the audio button.
-        """
+        """Mute/Unmute according to the audio button"""
         is_mute = self._player.audio_get_mute()
 
         self._player.audio_set_mute(not is_mute)
@@ -174,8 +164,7 @@ class Events:
         self.volume_var.set(self._player.audio_get_volume())
 
     def on_set_volume(self):
-        """Set the volume according to the volume sider.
-        """
+        """Set the volume according to the volume sider"""
         volume = self.volume_var.get()
         print("volume= ", volume)
         # volume = self.volslider.get() * 2
@@ -186,10 +175,5 @@ class Events:
             self.display_error("Failed to set volume")
 
     def display_error(self, errormessage):
-        """Display a simple error dialog.
-        """
-        edialog = messagebox.showerror(self, 'Error '+ errormessage)
-
-
-
-
+        """Display a simple error dialog"""
+        edialog = messagebox.showerror(self, 'Error ' + errormessage)

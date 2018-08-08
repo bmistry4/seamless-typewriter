@@ -1,14 +1,11 @@
 import sys
-import time
+
 if sys.version_info[0] < 3:
-    import Tkinter as Tk
     from tkinter import ttk
 else:
-    import tkinter as Tk
     from tkinter import ttk
-    from tkinter.messagebox import showinfo
     from tkinter.constants import *
-    import tkinter.font as tkFont
+    import tkinter.font as tkfont
 
 COLUMN_HEADINGS = ["Time", "Text"]
 data = [(i, i * 123234) for i in range(20)]
@@ -34,12 +31,10 @@ class ResultTable(ttk.Frame):
     def on_double_click(self, event):
         item = self.tree.identify('item', event.x, event.y)
         values = self.tree.item(item)["values"]
-        print(values)
         # return index only
         # TODO - make so not index (general)
         ts_sec = values[0]
         ts_ms = self.sec_to_ms(ts_sec)
-        print(ts_sec)
         # Set video player time
         self.master._event_handler.timeslider_last_val = ("%.0f" % ts_sec) + ".0"
         self.master._event_handler._time_slider.set(ts_sec)
@@ -54,12 +49,12 @@ class ResultTable(ttk.Frame):
         for col in COLUMN_HEADINGS:
             # adjust the column's width to the header string
             self.tree.column(col,
-                             width=tkFont.Font().measure(col.title()))
+                             width=tkfont.Font().measure(col.title()))
 
         for item in data:
             self.tree.insert('', 'end', values=item)
             # adjust column's width if necessary to fit each value
             for col_index, val in enumerate(item):
-                col_w = tkFont.Font().measure(val)
+                col_w = tkfont.Font().measure(val)
                 if self.tree.column(COLUMN_HEADINGS[col_index], width=None) < col_w:
                     self.tree.column(COLUMN_HEADINGS[col_index], width=col_w)

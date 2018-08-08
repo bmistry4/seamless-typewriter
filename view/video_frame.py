@@ -1,5 +1,7 @@
 import sys
 
+from view.tkk_Timer import TkkTimer
+
 if sys.version_info[0] < 3:
     import Tkinter as Tk
     from tkinter import ttk
@@ -7,11 +9,9 @@ else:
     import tkinter as Tk
     from tkinter import ttk
 
-from view.tkk_Timer import TkkTimer
 
 class VideoFrame(Tk.Frame):
-    """The main window has to deal with events.
-    """
+    """The main window has to deal with events"""
 
     def __init__(self, parent, event_handler):
         Tk.Frame.__init__(self, parent)
@@ -42,7 +42,6 @@ class VideoFrame(Tk.Frame):
         video_panel.pack(fill=Tk.BOTH, expand=1)
         video_control_panel.pack(side=Tk.BOTTOM)
         time_slider_panel.pack(side=Tk.BOTTOM, fill=Tk.X)
-
 
     def generate_video_panel(self, parent):
         canvas = Tk.Canvas(parent)

@@ -3,8 +3,7 @@ from threading import Thread, Event
 
 
 class TkkTimer(Thread):
-    """a class serving same function as wxTimer... but there may be better ways to do this
-    """
+    """a class serving same function as wxTimer... but there may be better ways to do this"""
 
     def __init__(self, callback, tick):
         Thread.__init__(self)
