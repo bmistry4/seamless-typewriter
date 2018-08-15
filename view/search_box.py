@@ -1,3 +1,5 @@
+"""Contains code for the search box and search button"""
+
 try:
     from Tkinter import Entry, Frame, Label, StringVar
     from Tkconstants import *
@@ -22,7 +24,7 @@ def hex2rgb(str_rgb):
     return tuple(int(v, 16) for v in (r, g, b))
 
 
-class Placeholder_State(object):
+class PlaceholderState(object):
     __slots__ = 'normal_color', 'normal_font', 'placeholder_text', 'placeholder_color', 'placeholder_font', 'contains_placeholder'
 
 
@@ -33,7 +35,7 @@ def add_placeholder_to(entry, placeholder, color="grey", font=None):
     if font is None:
         font = normal_font
 
-    state = Placeholder_State()
+    state = PlaceholderState()
     state.normal_color = normal_color
     state.normal_font = normal_font
     state.placeholder_color = color
