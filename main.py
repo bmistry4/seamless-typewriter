@@ -1,134 +1,49 @@
-import os
-
-import numpy as np
-import cv2
-from PIL import Image
-from pytesseract import pytesseract
-from collections import defaultdict
 import math
-import re, string
+import os
+import re
+import string
+import tkinter as Tk
+from collections import defaultdict
 
-class VideoSearcher:
-    """
-        This class provides the data structures used to index and search for text in a video
-    """
+import cv2
+import numpy as np
+from pytesseract import pytesseract
+from model.video_searcher import VideoSearcher
+from view.main_frame import MainFrame
 
-    def __init__(self, video_path):
-        self.video_path = video_path  # File path to video
-        self.word_to_timestamps = defaultdict(set)  # word -> set of ts values (ints)
 
-        self.timestamp_num = 0  # initial value of total number of timestamps
-        self.video_length = 0.   # initial value of length of video in seconds
+class ViewMain:
+    def __init__(self, title="Seamless Typewriter"):
+        # Create a Tk.App(), which handles the windowing system event loop
+        self.root = self.tk_get_root()
+        self.root.protocol("WM_DELETE_WINDOW", self._quit)
+        self.root.winfo_toplevel().title(title)
 
-        self.populate_timestamp_structures(1)
+        MainFrame(self.root)
 
-        # TODO - remove after
-        print(self.word_to_timestamps)
-        print()
-        print("Words", self.word_to_timestamps.keys())
+        # show the player window centred and run the application
+        self.root.mainloop()
 
-    def populate_timestamp_structures(self, sampling_rate):
-        """
-        For all frames in the video withing the sampling rate, get the text from the video and update the timestamp
-        dicts
-        :param sampling_rate:
-            The rate (seconds) at which to process a frame
-        :return:
-            None
-        """
-        cap = cv2.VideoCapture(self.video_path)
-        # frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    def tk_get_root(self):
+        if not hasattr(self, "root"):  # (1)
+            self.root = Tk.Tk()  # initialization call is inside the function
+        return self.root
 
-        previous_timestamp = 0  # Last added timestamp to the timestamp dicts
-        current_timestamp = 0
-        current_index = 0
-        regex = re.compile('[%s]' % re.escape(string.punctuation))
 
-        while cap.isOpened():
-            frame_exists, frame = cap.read()
-
-            if not frame_exists:
-                break
-
-            # Timestamp in ms for the frame relative to the start of the video
-            current_timestamp = cap.get(cv2.CAP_PROP_POS_MSEC)
-            # Convert to seconds 0.d.p
-            current_timestamp = math.floor(current_timestamp / 1000)
-
-            time_diff = current_timestamp - previous_timestamp
-            # Only process if within the given sampling rate
-            if time_diff >= sampling_rate:
-
-                text = self.apply_ocr(frame)
-                # Split on new line and white spaces
-                words = re.split("\n|\\s", text)
-
-                # Populate the word-timestamp dicts
-                for w in words:
-                    w = regex.sub('', w.lower())
-                    if w != "":
-                        self.word_to_timestamps[w].add(current_index)
-
-                current_index += 1
-                previous_timestamp = current_timestamp
-
-        self.timestamp_num = current_timestamp
-        self.video_length = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
-
-        cap.release()
-        cv2.destroyAllWindows()
-
-    def timestamp_index_to_seconds(self, index):
-        """
-        Converts a timestamp index to its corresponding time in the video in seconds
-
-        :param index:
-            integer representing the timestamp index
-        :return:
-            integer representing the seconds in the video specified by the timestamp index
-        """
-        return math.floor(self.video_length * index / self.timestamp_num)
-
-    @staticmethod
-    def apply_ocr(image):
-        """
-        Given a frame, apply ocr and return the text
-        :param image:
-            Frame
-        :return:
-            Extracted text from the image
-        """
-        text = pytesseract.image_to_string(image)
-        return text
-
-    def get_timestamps(self, phrase):
-        """
-        Given a phrase, returns all timestamps to frames of the video that may contain the phrase, ranked in order of
-        likelihood
-
-        :param phrase:
-            a string with one or more words
-        :return:
-            numpy array of timestamps as ints, with the best results first
-        """
-        timestamp_counts = np.zeros(self.timestamp_num)
-
-        words = phrase.split()
-        for word in words:
-            timestamp_set = self.word_to_timestamps[word]
-            for timestamp in timestamp_set:
-                timestamp_counts[timestamp] += 1
-
-        # clever trick - indices of array are equal to their equivalent timestamps
-        timestamp_counts = np.argsort(timestamp_counts)
-        # reverse array so in descending order
-        timestamp_counts = timestamp_counts[::-1]
-
-        timestamp_counts = np.where(timestamp_counts > 0)
-
-        return timestamp_counts
+    def _quit(self):
+        print("_quit: bye")
+        root = self.tk_get_root()
+        root.quit()  # stops mainloop
+        root.destroy()  # this is necessary on Windows to prevent
+        # Fatal Python Error: PyEval_RestoreThread: NULL tstate
+        os._exit(1)
 
 
 if __name__ == '__main__':
-    video_path = r"videos\mysql.mp4"
-    VideoSearcher(video_path=video_path)
+    # video_path = r"videos\mysql.mp4"
+    # searcher = VideoSearcher(video_path=video_path)
+    # print(searcher.get_timestamps("add"))
+    # print(searcher.get_text(5))
+
+    ViewMain()
+
