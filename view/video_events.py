@@ -8,16 +8,16 @@ import vlc
 import tkinter as Tk
 from tkinter import messagebox
 
-class Events:
 
+class Events:
     def __init__(self, parent_frame):
         self.parent_frame = parent_frame
+        self.prev_vol = 0
 
         self._player = None
-        self._video_panel  = None
+        self._video_panel = None
         self._volume_slider = None
         self._time_slider = None
-
 
         # VLC player controls
         self.video_instance = vlc.Instance()
@@ -30,11 +30,20 @@ class Events:
         self.timeslider_last_val = ""
         self.timeslider_last_update = time.time()
 
-
     def on_exit(self, evt):
         """Closes the window.
         """
         self.Close()
+
+    # When control-o pressed
+    def on_ctrl_o(self, event):
+        self.on_open()
+
+    def on_p(self, event):
+        self.on_pause()
+
+    def on_m(self, event):
+        self.on_toggle_volume(event)
 
     def on_open(self):
         """Pop up a new dialow window to choose a file, then play the selected file.
@@ -60,7 +69,7 @@ class Events:
             title = self._player.get_title()
             #  if an error was encountred while retriving the title, then use  filename
             if title == -1:
-               title = filename
+                title = filename
 
             self.parent_frame.update_status_bar(title)
 
@@ -185,11 +194,20 @@ class Events:
         if self._player.audio_set_volume(volume) == -1:
             self.display_error("Failed to set volume")
 
+    def mute(self):
+        current_vol = self.volume_var.get()
+        if current_vol != 0:
+            self.prev_vol = current_vol
+            # model component update
+            self.volume_var.set(0)
+
+            # view component update
+            self._volume_slider.set(0)
+        else:
+            self.volume_var.set(self.prev_vol)
+            self._volume_slider.set(self.prev_vol)
+
     def display_error(self, errormessage):
         """Display a simple error dialog.
         """
-        edialog = messagebox.showerror(self, 'Error '+ errormessage)
-
-
-
-
+        edialog = messagebox.showerror(self, 'Error ' + errormessage)

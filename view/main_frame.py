@@ -32,6 +32,11 @@ class MainFrame(Frame):
         # self.generate_browse_and_search(rightFrame)
         self.generate_video(rightFrame)
 
+        # Control o to open file explorer
+        self.root_Tk.bind("<Control-o>", self.event_handler.on_ctrl_o)
+        self.root_Tk.bind("<p>", self.event_handler.on_p)
+        self.root_Tk.bind("<m>", self.event_handler.on_m)
+
 
     def generate_menubar(self, parent):
         menubar = Tk.Menu(parent)

@@ -7,7 +7,7 @@ else:
     import tkinter as Tk
     from tkinter import ttk
 
-from view.tkk_Timer import TkkTimer
+from view.tkk_timer import TkkTimer
 
 class VideoFrame(Tk.Frame):
     """The main window has to deal with events.
