@@ -23,9 +23,6 @@ class SearchFrame(Tk.Frame):
 
         table = ResultTable(self)
         table.pack(fill=BOTH, expand=True)
-        # frame = Tk.Frame(self, height=400)
-        # frame.configure(background='blue')
-        # frame.pack(fill=X)
 
     @property
     def event_handler(self):

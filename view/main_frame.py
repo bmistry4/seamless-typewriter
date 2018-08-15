@@ -66,4 +66,5 @@ class MainFrame(Frame):
         self.status['text'] = text
 
     def on_dummy(self):
+        """Used for testing WIP features"""
         print("Clicked on something")

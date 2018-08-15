@@ -15,6 +15,8 @@ class ResultTable(ttk.Frame):
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent)
 
+        self.parent = parent
+
         self.tree = ttk.Treeview(columns=COLUMN_HEADINGS, show="headings")
         vsb = ttk.Scrollbar(orient=VERTICAL, command=self.tree.yview)
         hsb = ttk.Scrollbar(orient="horizontal", command=self.tree.xview)
@@ -36,10 +38,10 @@ class ResultTable(ttk.Frame):
         ts_sec = values[0]
         ts_ms = self.sec_to_ms(ts_sec)
         # Set video player time
-        self.master._event_handler.timeslider_last_val = ("%.0f" % ts_sec) + ".0"
-        self.master._event_handler._time_slider.set(ts_sec)
+        self.parent.event_handler.timeslider_last_val = ("%.0f" % ts_sec) + ".0"
+        self.parent.event_handler._time_slider.set(ts_sec)
         # Set slider time
-        self.master._event_handler._player.set_time(int(ts_ms))
+        self.parent._event_handler._player.set_time(int(ts_ms))
 
     def sec_to_ms(self, val):
         # 1000 ms in 1 ms
@@ -48,9 +50,11 @@ class ResultTable(ttk.Frame):
     def create_tree(self):
         for col in COLUMN_HEADINGS:
             # adjust the column's width to the header string
-            self.tree.column(col,
-                             width=tkfont.Font().measure(col.title()))
+            self.tree.column(col, width=tkfont.Font().measure(col.title()))
 
+        self.insert_data(data)
+
+    def insert_data(self, data):
         for item in data:
             self.tree.insert('', 'end', values=item)
             # adjust column's width if necessary to fit each value
@@ -58,3 +62,7 @@ class ResultTable(ttk.Frame):
                 col_w = tkfont.Font().measure(val)
                 if self.tree.column(COLUMN_HEADINGS[col_index], width=None) < col_w:
                     self.tree.column(COLUMN_HEADINGS[col_index], width=col_w)
+
+    def update_results(self, results):
+        self.tree.delete(*self.tree.get_children())
+        self.insert_data(results)
