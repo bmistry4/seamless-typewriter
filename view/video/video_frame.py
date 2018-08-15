@@ -7,7 +7,7 @@ else:
     import tkinter as Tk
     from tkinter import ttk
 
-from view.tkk_timer import TkkTimer
+from view.video.tkk_timer import TkkTimer
 
 
 class VideoFrame(Tk.Frame):

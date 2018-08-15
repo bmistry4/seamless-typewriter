@@ -2,9 +2,9 @@ import tkinter as tk
 from tkinter.constants import *
 from tkinter.ttk import Frame, Label, Button
 
-from view.video_frame import VideoFrame
-from view.video_events import Events
-from view.search_frame import SearchFrame
+from view.video.video_frame import VideoFrame
+from view.video.video_events import Events
+from view.search.search_frame import SearchFrame
 
 
 class MainFrame(Frame):
@@ -32,13 +32,10 @@ class MainFrame(Frame):
         # self.generate_browse_and_search(right_frame)
         self.generate_video(right_frame)
 
-
         # Control o to open file explorer
         self.root_Tk.bind("<Control-o>", self.event_handler.on_ctrl_o)
         self.root_Tk.bind("<p>", self.event_handler.on_p)
         self.root_Tk.bind("<m>", self.event_handler.on_m)
-
-
 
     def generate_menubar(self, parent):
         menubar = tk.Menu(parent)

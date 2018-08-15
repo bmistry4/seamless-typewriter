@@ -1,8 +1,8 @@
 """The tkinter frame containing the search box, button, and results table"""
 
 import sys
-from view.search_box import SearchBox
-from view.result_table import ResultTable
+from view.search.search_box import SearchBox
+from view.search.result_table import ResultTable
 
 if sys.version_info[0] < 3:
     import Tkinter as Tk
