@@ -16,6 +16,7 @@ class VideoSearcher:
     def __init__(self, video_path):
         self.video_path = video_path  # File path to video
         self.word_to_timestamps = defaultdict(set)  # word -> set of ts values (ints)
+        self.timestamp_to_sentence = {}  # Keep track of full text relating to a timestamp
 
         self.timestamp_num = 0  # initial value of total number of timestamps
         self.video_length = 0   # initial value of length of video in seconds
@@ -60,6 +61,8 @@ class VideoSearcher:
             if time_diff >= sampling_rate:
 
                 text = self.apply_ocr(frame)
+                self.timestamp_to_sentence[current_index] = text.lower()
+
                 # Split on new line and white spaces
                 words = re.split("\n|\\s", text)
 
@@ -125,7 +128,17 @@ class VideoSearcher:
 
         return timestamp_counts
 
+    def get_text(self, timestamp):
+        """
+        Return text found at the given timestamp
+        :param timestamp: one of the possible occurance/s (in seconds) of the searched term
+        :return: the string of text relating to the value
+        """
+        return self.timestamp_to_sentence[timestamp]
+
 
 if __name__ == '__main__':
     video_path = r"videos\mysql.mp4"
-    VideoSearcher(video_path=video_path)
+    searcher = VideoSearcher(video_path=video_path)
+    print(searcher.get_timestamps("add"))
+    print(searcher.get_text(5))
