@@ -17,6 +17,7 @@ class SearchFrame(Tk.Frame):
         Tk.Frame.__init__(self, parent)
         self._event_handler = event_handler
 
+        # Create gui components and pack them
         search_box = SearchBox(self, command=self.on_search, placeholder="Type and press enter",
                                entry_highlightthickness=0)
         search_box.pack(pady=6, padx=3, side=TOP, fill=X)

@@ -36,12 +36,27 @@ class Events:
 
     # When control-o pressed
     def on_ctrl_o(self, event):
+        """
+        When ctrl-o is pressed open a file fialog to select a video
+        :param event: Event from clicking the key binding
+        :return: None
+        """
         self.on_open()
 
     def on_p(self, event):
+        """
+        Key binding for 'p', pause and unpause
+        :param event:
+        :return: None
+        """
         self.on_pause()
 
     def on_m(self, event):
+        """
+        Key binding for 'm', mute and unmute
+        :param event:
+        :return:
+        """
         self.on_toggle_volume(event)
 
     def on_open(self):

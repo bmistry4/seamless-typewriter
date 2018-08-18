@@ -8,14 +8,21 @@ from view.search.search_frame import SearchFrame
 
 
 class MainFrame(Frame):
+    """
+    Main GUI frame containing all the view components
+    """
+
     def __init__(self, root_tk, width=800, height=600):
         self.root_Tk = root_tk
 
         Frame.__init__(self, root_tk, width=width, height=height)
 
+        # Event handler in charge of sorting out any user interaction
         self.event_handler = Events(self)
+
         self.pack(side=TOP, fill=BOTH, expand=True)
 
+        # Status bar - shows name of video selected
         self.status = Label(self, text="Video:", relief=SUNKEN, anchor=W)
         self.status.pack(side=BOTTOM, fill=X)
 
@@ -32,12 +39,18 @@ class MainFrame(Frame):
         # self.generate_browse_and_search(right_frame)
         self.generate_video(right_frame)
 
-        # Control o to open file explorer
+        # Add key bindings
         self.root_Tk.bind("<Control-o>", self.event_handler.on_ctrl_o)
         self.root_Tk.bind("<p>", self.event_handler.on_p)
         self.root_Tk.bind("<m>", self.event_handler.on_m)
 
     def generate_menubar(self, parent):
+        """
+        Add a menu bar to the top
+        Contain at least the Open option to select a video
+        :param parent:
+        :return:
+        """
         menubar = tk.Menu(parent)
         parent.config(menu=menubar)
 
@@ -45,16 +58,12 @@ class MainFrame(Frame):
         file_menu.add_command(label="Open", underline=0, command=self.event_handler.on_open)
         menubar.add_cascade(label="File", menu=file_menu)
 
-    def generate_browse_and_search(self, parent):
-        sub_frame = Frame(parent)
-        sub_frame.pack(fill=X)
-        browse_bttn = Button(sub_frame, text="Browse", command=self.on_dummy)
-        browse_bttn.grid(row=0, column=0)
-
-        path_label = Label(sub_frame, text="BLANK")
-        path_label.grid(row=0, column=1)
-
     def generate_video(self, parent):
+        """
+        Create and add the video GUI components
+        :param parent:
+        :return: None
+        """
         video = VideoFrame(parent, self.event_handler)
         video.pack()
         video.pack(fill=X)
@@ -69,7 +78,3 @@ class MainFrame(Frame):
             None
         """
         self.status['text'] = text
-
-    def on_dummy(self):
-        """Used for testing WIP features"""
-        print("Clicked on something")

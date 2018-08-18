@@ -11,7 +11,9 @@ from view.video.tkk_timer import TkkTimer
 
 
 class VideoFrame(Tk.Frame):
-    """The main window has to deal with events"""
+    """The main window (frame) containing all video related GUI components. This includes: the video, and all video
+    button commands
+    """
 
     def __init__(self, parent, event_handler):
         Tk.Frame.__init__(self, parent)
@@ -19,12 +21,15 @@ class VideoFrame(Tk.Frame):
         self.parent = parent
         self.event_handler = event_handler
 
+        # Create video panel
         video_panel = ttk.Frame(self.parent)
         self.generate_video_panel(video_panel)
 
+        # Create the video control buttons
         video_control_panel = ttk.Frame(self.parent)
         volume_slider = self.generate_control_panel(video_control_panel)
 
+        # Create the timer slider for the video
         time_slider_panel = ttk.Frame(self.parent)
         time_slider = self.generate_time_slider(time_slider_panel)
 
@@ -44,10 +49,20 @@ class VideoFrame(Tk.Frame):
         time_slider_panel.pack(side=Tk.BOTTOM, fill=Tk.X)
 
     def generate_video_panel(self, parent):
+        """
+        Panel which displays the video
+        :param parent: Parent panel/ frame
+        :return: None
+        """
         canvas = Tk.Canvas(parent)
         canvas.pack(fill=Tk.BOTH, expand=1)
 
     def generate_control_panel(self, parent):
+        """
+        Create the buttons used for user options to control the video (e.g. play, pause, stop...)
+        :param parent:
+        :return:
+        """
         pause = ttk.Button(parent, text="Pause", command=self.event_handler.on_pause)
         play = ttk.Button(parent, text="Play", command=self.event_handler.on_play)
         stop = ttk.Button(parent, text="Stop", command=self.event_handler.on_stop)
@@ -58,6 +73,7 @@ class VideoFrame(Tk.Frame):
         stop.pack(side=Tk.LEFT)
         volume.pack(side=Tk.LEFT)
 
+        # Volume control
         volslider = Tk.Scale(parent, variable=self.event_handler.volume_var,
                              command=self.event_handler.volume_sel,
                              from_=0, to=100, orient=Tk.HORIZONTAL, length=100)
@@ -65,11 +81,20 @@ class VideoFrame(Tk.Frame):
         return volslider
 
     def generate_time_slider(self, parent):
+        """
+        Create a time slider responsible for keeping track of how far a video has played
+        :param parent: Parent panel/ frame
+        :return: The timer slider
+        """
         timeslider = Tk.Scale(parent, variable=self.event_handler.scale_var, command=self.event_handler.scale_sel,
                               from_=0, to=1000, orient=Tk.HORIZONTAL, length=500)
         timeslider.pack(side=Tk.BOTTOM, fill=Tk.X, expand=1)
         return timeslider
 
     def begin_timer(self):
+        """
+        Start a timer in a new thread
+        :return: None
+        """
         self.timer = TkkTimer(self.event_handler.on_timer, 1.0)
         self.timer.start()
