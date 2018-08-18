@@ -24,6 +24,7 @@ class SearchFrame(Tk.Frame):
 
         table = ResultTable(self)
         table.pack(fill=BOTH, expand=True)
+        self.pack(fill=BOTH, expand=True)
 
     @property
     def event_handler(self):

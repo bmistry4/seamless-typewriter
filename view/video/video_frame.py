@@ -5,10 +5,10 @@ if sys.version_info[0] < 3:
     from tkinter import ttk
 else:
     import tkinter as Tk
+    from tkinter.constants import *
     from tkinter import ttk
 
 from view.video.tkk_timer import TkkTimer
-
 
 class VideoFrame(Tk.Frame):
     """The main window (frame) containing all video related GUI components. This includes: the video, and all video
@@ -44,9 +44,14 @@ class VideoFrame(Tk.Frame):
         self.event_handler._time_slider = time_slider
 
         # Deal with layout of sub-frames (containers)
-        video_panel.pack(fill=Tk.BOTH, expand=1)
-        video_control_panel.pack(side=Tk.BOTTOM)
-        time_slider_panel.pack(side=Tk.BOTTOM, fill=Tk.X)
+        # Let the video expand on resizing and let the slider expand on the X only. Let controls just be added below
+        # the slider
+        video_panel.pack(fill=BOTH, expand=True)
+        time_slider_panel.pack(fill=X)
+        video_control_panel.pack()
+
+        # Makes resizable
+        self.pack(fill=BOTH, expand=True)
 
     def generate_video_panel(self, parent):
         """
@@ -88,7 +93,7 @@ class VideoFrame(Tk.Frame):
         """
         timeslider = Tk.Scale(parent, variable=self.event_handler.scale_var, command=self.event_handler.scale_sel,
                               from_=0, to=1000, orient=Tk.HORIZONTAL, length=500)
-        timeslider.pack(side=Tk.BOTTOM, fill=Tk.X, expand=1)
+        timeslider.pack(side=BOTTOM, fill=X, expand=1)
         return timeslider
 
     def begin_timer(self):

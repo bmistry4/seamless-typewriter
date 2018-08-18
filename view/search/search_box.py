@@ -79,7 +79,7 @@ class SearchBox(Frame):
 
         self.entry = Entry(self, width=entry_width, background=entry_background, highlightcolor=button_background,
                            highlightthickness=entry_highlightthickness)
-        self.entry.pack(side=LEFT, fill=BOTH, ipady=1, padx=(0, spacing))
+        self.entry.pack(side=LEFT, fill=BOTH, expand=True, ipady=1, padx=(0, spacing))
 
         if entry_font:
             self.entry.configure(font=entry_font)

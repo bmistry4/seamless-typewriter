@@ -1,6 +1,7 @@
 import tkinter as tk
+from tkinter import Frame
 from tkinter.constants import *
-from tkinter.ttk import Frame, Label, Button
+from tkinter.ttk import Label
 
 from view.video.video_frame import VideoFrame
 from view.video.video_events import Events
@@ -26,17 +27,27 @@ class MainFrame(Frame):
         self.status = Label(self, text="Video:", relief=SUNKEN, anchor=W)
         self.status.pack(side=BOTTOM, fill=X)
 
+        # Create and add left and right top frames to the root frame
         left_frame = Frame(self)
         right_frame = Frame(self)
 
-        left_frame.pack(side=LEFT, )
-        right_frame.pack(side=RIGHT)
+        # TODO - Temp remove later
+        # self.configure(background='black')
+        # left_frame.configure(background='red')
+        # right_frame.configure(background='blue')
 
+        # BIG SECRET - fill=BOTH, expand=True = makes stuff resizable
+        left_frame.pack(fill=BOTH, expand=True, side=LEFT)
+        right_frame.pack(fill=BOTH, expand=True, side=RIGHT)
+
+        # Create menu bar
+        self.generate_menubar(root_tk)
+
+        # Create search stuff
         search_panel = SearchFrame(left_frame, self.event_handler)
         search_panel.pack()
 
-        self.generate_menubar(root_tk)
-        # self.generate_browse_and_search(right_frame)
+        # Create video stuff
         self.generate_video(right_frame)
 
         # Add key bindings
@@ -66,7 +77,7 @@ class MainFrame(Frame):
         """
         video = VideoFrame(parent, self.event_handler)
         video.pack()
-        video.pack(fill=X)
+        video.pack(expand=True)
 
     def update_status_bar(self, text):
         """

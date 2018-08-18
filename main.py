@@ -1,13 +1,5 @@
-import math
 import os
-import re
-import string
 import tkinter as Tk
-from collections import defaultdict
-
-import cv2
-import numpy as np
-from pytesseract import pytesseract
 from model.video_searcher import VideoSearcher
 from view.main_frame import MainFrame
 
