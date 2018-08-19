@@ -10,8 +10,9 @@ import vlc
 
 
 class Events:
-    def __init__(self, parent_frame):
+    def __init__(self, parent_frame, controller):
         self.parent_frame = parent_frame
+        self.controller = controller
         self.prev_vol = 0
 
         self._player = None
@@ -95,6 +96,8 @@ class Events:
             # set the volume slider to the current volume
             # self.volslider.SetValue(self.player.audio_get_volume() / 2)
             self._volume_slider.set(self._player.audio_get_volume())
+
+            self.controller.index_video(fullname)
 
     def on_play(self):
         """Toggle the status to Play/Pause.

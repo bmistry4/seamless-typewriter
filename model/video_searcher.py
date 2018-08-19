@@ -19,12 +19,7 @@ class VideoSearcher:
         self.timestamp_num = 0  # initial value of total number of timestamps
         self.video_length = 0   # initial value of length of video in seconds
 
-        self.populate_timestamp_structures(1)
-
-        # TODO - remove after
-        # print(self.word_to_timestamps)
-        # print()
-        # print("Words", self.word_to_timestamps.keys())
+        self.populate_timestamp_structures(10000)
 
     def populate_timestamp_structures(self, sampling_rate):
         """

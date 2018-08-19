@@ -82,9 +82,9 @@ class ResultTable(ttk.Frame):
             # adjust the column's width to the header string
             self.tree.column(col, width=tkfont.Font().measure(col.title()))
 
-        self.insert_data(data)
+        self._insert_data(data)
 
-    def insert_data(self, data):
+    def _insert_data(self, data):
         """
         Add rows to the table
         :param data: List of tuples which represent the rows
@@ -105,5 +105,8 @@ class ResultTable(ttk.Frame):
         :return: None
         """
         self.tree.delete(*self.tree.get_children())
-        self.insert_data(results)
+        if results is not None:
+            self._insert_data(results)
+        else:
+            self._insert_data([("No results found", )])
 

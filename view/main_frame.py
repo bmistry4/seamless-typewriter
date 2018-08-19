@@ -13,13 +13,14 @@ class MainFrame(Frame):
     Main GUI frame containing all the view components
     """
 
-    def __init__(self, root_tk, width=800, height=600):
+    def __init__(self, root_tk, controller, width=800, height=600):
         self.root_Tk = root_tk
+        self.controller = controller
 
         Frame.__init__(self, root_tk, width=width, height=height)
 
         # Event handler in charge of sorting out any user interaction
-        self.event_handler = Events(self)
+        self.event_handler = Events(self, controller)
 
         self.pack(side=TOP, fill=BOTH, expand=True)
 
@@ -44,7 +45,7 @@ class MainFrame(Frame):
         self.generate_menubar(root_tk)
 
         # Create search stuff
-        search_panel = SearchFrame(left_frame, self.event_handler)
+        search_panel = SearchFrame(left_frame, self.event_handler, self.controller)
         search_panel.pack()
 
         # Create video stuff

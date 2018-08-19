@@ -1,17 +1,19 @@
 import os
 import tkinter as Tk
+
+from controller import Controller
 from model.video_searcher import VideoSearcher
 from view.main_frame import MainFrame
 
 
 class ViewMain:
-    def __init__(self, title="Seamless Typewriter"):
+    def __init__(self, controller, title="Seamless Typewriter"):
         # Create a Tk.App(), which handles the windowing system event loop
         self.root = self.tk_get_root()
         self.root.protocol("WM_DELETE_WINDOW", self._quit)
         self.root.winfo_toplevel().title(title)
 
-        MainFrame(self.root)
+        MainFrame(self.root, controller)
 
         # show the player window centred and run the application
         self.root.mainloop()
@@ -20,7 +22,6 @@ class ViewMain:
         if not hasattr(self, "root"):  # (1)
             self.root = Tk.Tk()  # initialization call is inside the function
         return self.root
-
 
     def _quit(self):
         print("_quit: bye")
@@ -37,5 +38,8 @@ if __name__ == '__main__':
     # print(searcher.get_timestamps("add"))
     # print(searcher.get_text(5))
 
-    ViewMain()
+    controller = Controller()
+    view = ViewMain(controller)
+    controller.set_view(view)
+
 
