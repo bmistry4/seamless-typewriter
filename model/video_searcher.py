@@ -19,7 +19,7 @@ class VideoSearcher:
         self.timestamp_num = 0  # initial value of total number of timestamps
         self.video_length = 0   # initial value of length of video in seconds
 
-        self.populate_timestamp_structures(10000)
+        self.populate_timestamp_structures(3)
 
     def populate_timestamp_structures(self, sampling_rate):
         """
@@ -107,6 +107,7 @@ class VideoSearcher:
             numpy array of timestamps as ints, with the best results first
         """
         timestamp_counts = np.zeros(self.timestamp_num)
+        timestamp_set = set()
 
         words = phrase.split()
         for word in words:
@@ -114,10 +115,17 @@ class VideoSearcher:
             for timestamp in timestamp_set:
                 timestamp_counts[timestamp] += 1
 
+        num_results = len(timestamp_set)
+        if num_results == 0:
+            return None
+
         # clever trick - indices of array are equal to their equivalent timestamps
         timestamp_counts = np.argsort(timestamp_counts)
         # reverse array so in descending order
         timestamp_counts = timestamp_counts[::-1]
+
+        # don't include timestamps that had no results
+        timestamp_counts = timestamp_counts[:num_results]
 
         return timestamp_counts
 

@@ -106,7 +106,8 @@ class ResultTable(ttk.Frame):
         """
         self.tree.delete(*self.tree.get_children())
         if results is not None:
-            self._insert_data(results)
+            data = [(t, "placeholder") for t in results]
+            self._insert_data(data)
         else:
             self._insert_data([("No results found", )])
 

@@ -20,7 +20,4 @@ class Controller:
         if self.model is None:
             return None
         else:
-            timestamps = self.model.get_timestamps(search_term)
-            data = [(t, "placeholder") for t in timestamps]
-
-            return data
+            return self.model.get_timestamps(search_term)
