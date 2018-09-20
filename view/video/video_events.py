@@ -1,3 +1,4 @@
+import itertools
 import os
 import pathlib
 import platform
@@ -9,6 +10,7 @@ from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 
 import vlc
+from PIL import Image, ImageTk
 
 
 class Events:
@@ -31,6 +33,13 @@ class Events:
         self.scale_var = Tk.DoubleVar()
         self.timeslider_last_val = ""
         self.timeslider_last_update = time.time()
+
+        # loading stuff
+        self.loading = False
+        self.loading_canvas = None
+        self.loading_frames = None
+        self.loading_frame = None
+        self.loading_size = 50
 
     def on_exit(self, evt):
         """Closes the window"""
@@ -65,6 +74,12 @@ class Events:
         """Check if there is something in the queue"""
         try:
             self.thread_queue.get(False)
+            self.stop_loading_screen()
+
+            self.on_play()
+            # set the volume slider to the current volume
+            # self.volslider.SetValue(self.player.audio_get_volume() / 2)
+            self._volume_slider.set(self._player.audio_get_volume())
         except queue.Empty:
             self.parent_frame.after(1000, self.listen_for_thread_completion)
 
@@ -108,11 +123,55 @@ class Events:
             self.new_thread.start()
             self.parent_frame.after(1000, self.listen_for_thread_completion)
 
-            self.on_play()
+            self.display_loading_screen()
 
-            # set the volume slider to the current volume
-            # self.volslider.SetValue(self.player.audio_get_volume() / 2)
-            self._volume_slider.set(self._player.audio_get_volume())
+    def display_loading_screen(self):
+        self.loading_frames = self.load_gif("resources/loading.gif")
+
+        self.loading_frame = self.loading_frames[0]
+
+        self.loading_canvas = Tk.Canvas(self._video_panel, height=self.loading_size)
+        self.loading_canvas.create_image(self.loading_canvas.winfo_width() // 2,
+                                         self.loading_canvas.winfo_height() // 2,
+                                         image=self.loading_frame)
+        self.loading_canvas.pack(expand=True, fill=Tk.X)
+
+        self.loading = True
+        self.update_loading_screen(0)
+
+    def update_loading_screen(self, index):
+        """Because we have to animate gifs ourselves..."""
+        index = (index + 1) % len(self.loading_frames)
+        self.loading_frame = self.loading_frames[index]
+
+        self.loading_canvas.delete("all")
+        self.loading_canvas.create_image(self.loading_canvas.winfo_width() // 2, self.loading_canvas.winfo_height() // 2,
+                                         image=self.loading_frame, anchor=Tk.CENTER)
+        if self.loading:
+            # if still loading then call this method again to update next frame
+            self.parent_frame.after(40, self.update_loading_screen, index)
+        else:
+            self.loading_canvas.destroy()
+
+    def stop_loading_screen(self):
+        self.loading = False
+
+    def load_gif(self, path):
+        """Loads each frame (with scaling) into a list"""
+        frames = []
+
+        im = Image.open(path)
+        try:
+            for i in itertools.count(1):
+                new_im = Image.new("RGBA", im.size)
+                new_im.paste(im)
+                new_im.thumbnail((self.loading_size, self.loading_size), Image.ANTIALIAS)
+                frames.append(ImageTk.PhotoImage(new_im))
+                im.seek(i)
+        except EOFError:
+            pass  # end of sequence
+
+        return frames
 
     def on_play(self):
         """Toggle the status to Play/Pause.
