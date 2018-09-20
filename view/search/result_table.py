@@ -9,7 +9,6 @@ else:
 
 # List of column heading names
 COLUMN_HEADINGS = [constant.value[0] for constant in TABLE_HEADINGS]
-data = [(i, i * 123234) for i in range(20)]
 
 
 class ResultTable(ttk.Frame):
@@ -81,8 +80,6 @@ class ResultTable(ttk.Frame):
         for col in COLUMN_HEADINGS:
             # adjust the column's width to the header string
             self.tree.column(col, width=tkfont.Font().measure(col.title()))
-
-        self._insert_data(data)
 
     def _insert_data(self, data):
         """
