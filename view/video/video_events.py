@@ -1,6 +1,8 @@
 import os
 import pathlib
 import platform
+import queue
+import threading
 import time
 import tkinter as Tk
 from tkinter import messagebox
@@ -15,7 +17,6 @@ class Events:
         self.controller = controller
         self.prev_vol = 0
 
-        self._player = None
         self._video_panel = None
         self._volume_slider = None
         self._time_slider = None
@@ -60,6 +61,13 @@ class Events:
         """
         self.on_toggle_volume(event)
 
+    def listen_for_thread_completion(self):
+        """Check if there is something in the queue"""
+        try:
+            self.thread_queue.get(False)
+        except queue.Empty:
+            self.parent_frame.after(1000, self.listen_for_thread_completion)
+
     def on_open(self):
         """Pop up a new dialow window to choose a file, then play the selected file"""
         # if a file is already running, then stop it.
@@ -74,8 +82,8 @@ class Events:
             dirname = os.path.dirname(fullname)
             filename = os.path.basename(fullname)
             # Creation
-            self.Media = self.video_instance.media_new(str(os.path.join(dirname, filename)))
-            self._player.set_media(self.Media)
+            self.media = self.video_instance.media_new(str(os.path.join(dirname, filename)))
+            self._player.set_media(self.media)
 
             # Report the title of the file chosen
             title = self._player.get_title()
@@ -90,14 +98,21 @@ class Events:
                 self._player.set_hwnd(self.get_handle())
             else:
                 self._player.set_xwindow(self.get_handle())  # this line messes up windows
-            # FIXME: this should be made cross-platform
+
+            self.thread_queue = queue.Queue()
+            self.new_thread = threading.Thread(
+                target=self.controller.index_video,
+                kwargs={
+                    'path': fullname,
+                    'thread_queue': self.thread_queue})
+            self.new_thread.start()
+            self.parent_frame.after(1000, self.listen_for_thread_completion)
+
             self.on_play()
 
             # set the volume slider to the current volume
             # self.volslider.SetValue(self.player.audio_get_volume() / 2)
             self._volume_slider.set(self._player.audio_get_volume())
-
-            self.controller.index_video(fullname)
 
     def on_play(self):
         """Toggle the status to Play/Pause.

@@ -10,6 +10,7 @@ else:
 
 from view.video.tkk_timer import TkkTimer
 
+
 class VideoFrame(Tk.Frame):
     """The main window (frame) containing all video related GUI components. This includes: the video, and all video
     button commands
