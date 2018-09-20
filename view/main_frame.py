@@ -63,6 +63,8 @@ class MainFrame(Frame):
 
         file_menu = tk.Menu(menubar)
         file_menu.add_command(label="Open", underline=0, command=self.event_handler.on_open)
+        file_menu.add_command(label="Youtube Download", command=self.event_handler.on_youtube_download)
+
         menubar.add_cascade(label="File", menu=file_menu)
 
     def generate_video(self, parent):

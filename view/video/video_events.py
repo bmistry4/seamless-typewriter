@@ -6,10 +6,10 @@ import threading
 import time
 import tkinter as Tk
 from tkinter import messagebox
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfile
 
 import vlc
-
+from pytube import YouTube
 
 class Events:
     def __init__(self, parent_frame, controller):
@@ -78,7 +78,17 @@ class Events:
         p = pathlib.Path(os.path.expanduser("~"))
         fullname = askopenfilename(initialdir=p, title="Choose your file",
                                    filetypes=(("all files", "*.*"), ("mp4 files", "*.mp4")))
+
+        self.update_video(fullname)
+
+    def update_video(self, fullname):
+        """
+        Update the GUI video with the video file path given as a argument
+        :param fullname: video file path (+extension)
+        :return:
+        """
         if os.path.isfile(fullname):
+
             dirname = os.path.dirname(fullname)
             filename = os.path.basename(fullname)
             # Creation
@@ -113,6 +123,38 @@ class Events:
             # set the volume slider to the current volume
             # self.volslider.SetValue(self.player.audio_get_volume() / 2)
             self._volume_slider.set(self._player.audio_get_volume())
+
+    def file_save_dialog(self):
+        """
+        Open a save dialog to get a path where the user wants to save the downloaded youtube video to
+        :return: str/ bool - filepath or False if cancel was clicked
+        """
+        file = asksaveasfile(defaultextension=".mp4")
+        if file is None:  # asksaveasfile return `None` if dialog closed with "cancel".
+            return False
+        filename = file.name
+        file.close()
+        return filename
+
+    def on_youtube_download(self):
+        """
+        Opens dialog to download youtube video and opens it on the canvas
+        :return:
+        """
+        fullname = self.file_save_dialog()
+        if fullname is not False:
+            save_location = os.path.dirname(fullname)
+            filename = os.path.basename(fullname)
+            filename, extension = os.path.splitext(filename)
+            print("Downloading from youtube...")
+            yt = YouTube('https://www.youtube.com/watch?v=_dfLdIsRNdM')
+            # Only get mp4 streams and choose the highest quality download
+            yt.streams.filter(subtype='mp4').first().download(output_path=save_location, filename=filename)
+            print("... 100% downloaded")
+            # Stop and currently playing videos
+            self.on_stop()
+            # Update the canvas with the new video
+            self.update_video(fullname)
 
     def on_play(self):
         """Toggle the status to Play/Pause.
