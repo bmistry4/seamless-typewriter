@@ -79,7 +79,7 @@ class Events:
 
             # Report the title of the file chosen
             title = self._player.get_title()
-            #  if an error was encountred while retriving the title, then use  filename
+            #  if an error was encountered while retrieving the title, then use filename
             if title == -1:
                 title = filename
 
@@ -115,7 +115,6 @@ class Events:
     def get_handle(self):
         return self._video_panel.winfo_id()
 
-    # def OnPause(self, evt):
     def on_pause(self):
         """Pause the player"""
         self._player.pause()

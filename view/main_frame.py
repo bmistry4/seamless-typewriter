@@ -32,11 +32,6 @@ class MainFrame(Frame):
         left_frame = Frame(self)
         right_frame = Frame(self)
 
-        # TODO - Temp remove later
-        # self.configure(background='black')
-        # left_frame.configure(background='red')
-        # right_frame.configure(background='blue')
-
         # BIG SECRET - fill=BOTH, expand=True = makes stuff resizable
         left_frame.pack(fill=BOTH, expand=True, side=LEFT)
         right_frame.pack(fill=BOTH, expand=True, side=RIGHT)

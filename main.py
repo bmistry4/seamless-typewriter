@@ -33,11 +33,6 @@ class ViewMain:
 
 
 if __name__ == '__main__':
-    # video_path = r"videos\mysql.mp4"
-    # searcher = VideoSearcher(video_path=video_path)
-    # print(searcher.get_timestamps("add"))
-    # print(searcher.get_text(5))
-
     controller = Controller()
     view = ViewMain(controller)
     controller.set_view(view)
