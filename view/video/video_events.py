@@ -11,6 +11,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfile
 
 import vlc
 from pytube import YouTube
+from pytube.exceptions import RegexMatchError
 
 class Events:
     def __init__(self, parent_frame, controller):
@@ -139,22 +140,31 @@ class Events:
 
     def on_youtube_download(self, url_entry, checkbox_sel):
         """
-        Opens dialog to download youtube video and opens it on the canvas
+        Download and potentially play given youtube url
+        :param url_entry: field widget reference for entering the url
+        :param checkbox_sel: reference to checkbox int variable (representing the selection state)
         :return:
         """
         auto_play = True if checkbox_sel.get() == 1 else False
+        # Get the file path and file name to save the video to
         fullname = self.file_save_dialog()
+        # Meaning the cancel button isn't clicked
         if fullname is not False:
             save_location = os.path.dirname(fullname)
             filename = os.path.basename(fullname)
             filename, extension = os.path.splitext(filename)
             print("Downloading from youtube...")
-            # yt = YouTube('https://www.youtube.com/watch?v=_dfLdIsRNdM')
-            yt = YouTube(url_entry.get())
-            # Only get mp4 streams and choose the highest quality download
-            yt.streams.filter(subtype='mp4').first().download(output_path=save_location, filename=filename)
+            try:
+                yt = YouTube(url_entry.get())
+                # Only get mp4 streams and choose the highest quality download
+                yt.streams.filter(subtype='mp4').first().download(output_path=save_location, filename=filename)
+            except RegexMatchError as err:
+                print("ERROR --> RegexMatchError: Invalid URL. Exiting Method")
+                return False
             print("... 100% downloaded")
+            Tk.messagebox.showinfo("Successful Download", "Video downloaded")
 
+            # Start playing downloaded video if option is selected
             if auto_play:
                 # Stop and currently playing videos
                 self.on_stop()
