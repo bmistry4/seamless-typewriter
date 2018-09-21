@@ -64,7 +64,6 @@ class MainFrame(Frame):
 
         file_menu = tk.Menu(menubar)
         file_menu.add_command(label="Open", underline=0, command=self.event_handler.on_open)
-        file_menu.add_command(label="Youtube Download", command=self.event_handler.on_youtube_download)
 
         menubar.add_cascade(label="File", menu=file_menu)
 
@@ -74,13 +73,13 @@ class MainFrame(Frame):
         :param parent:
         :return: None
         """
-        video = VideoFrame(parent, self.event_handler)
-        video.pack()
-        video.pack(expand=True)
-
         # Create youtube download stuff
         youtube_panel = YoutubeFrame(parent, self.event_handler)
         youtube_panel.pack(fill=BOTH, expand=True)
+
+        video = VideoFrame(parent, self.event_handler)
+        # video.pack()
+        video.pack(expand=True)
 
     def update_status_bar(self, text):
         """
