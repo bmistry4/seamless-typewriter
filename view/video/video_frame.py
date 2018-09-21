@@ -72,12 +72,10 @@ class VideoFrame(Tk.Frame):
         pause = ttk.Button(parent, text="Pause", command=self.event_handler.on_pause)
         play = ttk.Button(parent, text="Play", command=self.event_handler.on_play)
         stop = ttk.Button(parent, text="Stop", command=self.event_handler.on_stop)
-        volume = ttk.Button(parent, text="Volume", command=self.event_handler.on_set_volume)
 
         pause.pack(side=Tk.LEFT)
         play.pack(side=Tk.LEFT)
         stop.pack(side=Tk.LEFT)
-        volume.pack(side=Tk.LEFT)
 
         # Volume control
         volslider = Tk.Scale(parent, variable=self.event_handler.volume_var,

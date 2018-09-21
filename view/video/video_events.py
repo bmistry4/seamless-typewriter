@@ -260,17 +260,6 @@ class Events:
         # and our volume slider has range [0, 100], just divide by 2.
         self.volume_var.set(self._player.audio_get_volume())
 
-    def on_set_volume(self):
-        """Set the volume according to the volume sider"""
-        volume = self.volume_var.get()
-        print("volume= ", volume)
-        # volume = self.volslider.get() * 2
-        # vlc.MediaPlayer.audio_set_volume returns 0 if success, -1 otherwise
-        if volume > 100:
-            volume = 100
-        if self._player.audio_set_volume(volume) == -1:
-            self.display_error("Failed to set volume")
-
     def mute(self):
         current_vol = self.volume_var.get()
         if current_vol != 0:
