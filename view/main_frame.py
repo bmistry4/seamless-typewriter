@@ -77,8 +77,8 @@ class MainFrame(Frame):
         youtube_panel = YoutubeFrame(parent, self.event_handler)
         youtube_panel.pack(fill=BOTH, expand=True)
 
+        # Add video stuff
         video = VideoFrame(parent, self.event_handler)
-        # video.pack()
         video.pack(expand=True)
 
     def update_status_bar(self, text):

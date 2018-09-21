@@ -1,6 +1,8 @@
 import sys
 from tkinter import ttk
 from functools import partial
+import PIL.Image
+import PIL.ImageTk
 
 if sys.version_info[0] < 3:
     import Tkinter as Tk
@@ -16,9 +18,16 @@ class YoutubeFrame(Tk.Frame):
 
         # Create gui components and pack them
         url_entry = EntryWithPlaceholder(self, "Enter YouTube URL")
-        download_button = ttk.Button(self, text="Download", command=partial(self.event_handler.on_youtube_download,
-                                                                            url_entry=url_entry))
 
+        file = r"resources\test.png"
+        im = PIL.Image.open(file)
+        im = im.resize((100, 50), PIL.Image.ANTIALIAS)
+        photo = PIL.ImageTk.PhotoImage(im)
+        download_button = Tk.Button(self, image=photo, bd=0)
+        download_button.image = photo  # keep a reference to avoid garbage collection!
+
+        # download_button = Tk.Button(self, text="Download", command=partial(self.event_handler.on_youtube_download,
+        #                                                                     url_entry=url_entry))
         url_entry.pack(fill=X, expand=True, padx=10, side=LEFT)
         download_button.pack(fill=X, padx=10, side=LEFT)
 
