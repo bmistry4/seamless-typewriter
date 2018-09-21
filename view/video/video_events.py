@@ -77,9 +77,6 @@ class Events:
             self.stop_loading_screen()
 
             self.on_play()
-            # set the volume slider to the current volume
-            # self.volslider.SetValue(self.player.audio_get_volume() / 2)
-            self._volume_slider.set(self._player.audio_get_volume())
         except queue.Empty:
             self.parent_frame.after(1000, self.listen_for_thread_completion)
 
@@ -93,6 +90,7 @@ class Events:
         p = pathlib.Path(os.path.expanduser("~"))
         fullname = askopenfilename(initialdir=p, title="Choose your file",
                                    filetypes=(("all files", "*.*"), ("mp4 files", "*.mp4")))
+        # fullname = r"D:\Documents\Programming\Python\Workspace\seamless-typewriter\videos\photosynthesis.mp4"
         if os.path.isfile(fullname):
             dirname = os.path.dirname(fullname)
             filename = os.path.basename(fullname)
@@ -291,4 +289,4 @@ class Events:
 
     def display_error(self, errormessage):
         """Display a simple error dialog"""
-        edialog = messagebox.showerror(self, 'Error ' + errormessage)
+        edialog = messagebox.showerror(self, 'Error: ' + errormessage)

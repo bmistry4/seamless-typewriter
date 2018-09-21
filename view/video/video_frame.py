@@ -37,8 +37,6 @@ class VideoFrame(Tk.Frame):
         self.begin_timer()
         self.parent.update()
 
-        # self.player.set_hwnd(self.GetHandle()) # for windows, OnOpen does does this
-
         # set in events handler
         self.event_handler._video_panel = video_panel
         self.event_handler._volume_slider = volume_slider
@@ -83,6 +81,7 @@ class VideoFrame(Tk.Frame):
         volslider = Tk.Scale(parent, variable=self.event_handler.volume_var,
                              command=self.event_handler.volume_sel,
                              from_=0, to=100, orient=Tk.HORIZONTAL, length=100)
+        volslider.set(100)
         volslider.pack(side=Tk.LEFT)
         return volslider
 
