@@ -4,6 +4,7 @@ import platform
 import queue
 import threading
 import time
+from tkinter import *
 import tkinter as Tk
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename, asksaveasfile
@@ -136,25 +137,29 @@ class Events:
         file.close()
         return filename
 
-    def on_youtube_download(self):
+    def on_youtube_download(self, url_entry, checkbox_sel):
         """
         Opens dialog to download youtube video and opens it on the canvas
         :return:
         """
+        auto_play = True if checkbox_sel.get() == 1 else False
         fullname = self.file_save_dialog()
         if fullname is not False:
             save_location = os.path.dirname(fullname)
             filename = os.path.basename(fullname)
             filename, extension = os.path.splitext(filename)
             print("Downloading from youtube...")
-            yt = YouTube('https://www.youtube.com/watch?v=_dfLdIsRNdM')
+            # yt = YouTube('https://www.youtube.com/watch?v=_dfLdIsRNdM')
+            yt = YouTube(url_entry.get())
             # Only get mp4 streams and choose the highest quality download
             yt.streams.filter(subtype='mp4').first().download(output_path=save_location, filename=filename)
             print("... 100% downloaded")
-            # Stop and currently playing videos
-            self.on_stop()
-            # Update the canvas with the new video
-            self.update_video(fullname)
+
+            if auto_play:
+                # Stop and currently playing videos
+                self.on_stop()
+                # Update the canvas with the new video
+                self.update_video(fullname)
 
     def on_play(self):
         """Toggle the status to Play/Pause.

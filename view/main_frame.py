@@ -6,7 +6,7 @@ from tkinter.ttk import Label
 from view.video.video_frame import VideoFrame
 from view.video.video_events import Events
 from view.search.search_frame import SearchFrame
-
+from view.youtube_download.youtube_frame import YoutubeFrame
 
 class MainFrame(Frame):
     """
@@ -76,6 +76,11 @@ class MainFrame(Frame):
         video = VideoFrame(parent, self.event_handler)
         video.pack()
         video.pack(expand=True)
+
+        # Create youtube download stuff
+        youtube_panel = YoutubeFrame(parent, self.event_handler)
+        youtube_panel.pack(fill=BOTH , expand=True)
+
 
     def update_status_bar(self, text):
         """
