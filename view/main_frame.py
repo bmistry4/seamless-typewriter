@@ -3,9 +3,10 @@ from tkinter import Frame
 from tkinter.constants import *
 from tkinter.ttk import Label
 
-from view.video.video_frame import VideoFrame
-from view.video.video_events import Events
 from view.search.search_frame import SearchFrame
+from view.video.video_events import Events
+from view.video.video_frame import VideoFrame
+from view.youtube_download.youtube_frame import YoutubeFrame
 
 
 class MainFrame(Frame):
@@ -63,6 +64,7 @@ class MainFrame(Frame):
 
         file_menu = tk.Menu(menubar)
         file_menu.add_command(label="Open", underline=0, command=self.event_handler.on_open)
+
         menubar.add_cascade(label="File", menu=file_menu)
 
     def generate_video(self, parent):
@@ -71,8 +73,12 @@ class MainFrame(Frame):
         :param parent:
         :return: None
         """
+        # Create youtube download stuff
+        youtube_panel = YoutubeFrame(parent, self.event_handler)
+        youtube_panel.pack(fill=BOTH, expand=True)
+
         video = VideoFrame(parent, self.event_handler)
-        video.pack()
+        # video.pack()
         video.pack(expand=True)
 
     def update_status_bar(self, text):

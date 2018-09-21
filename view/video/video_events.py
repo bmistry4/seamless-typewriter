@@ -7,10 +7,12 @@ import threading
 import time
 import tkinter as Tk
 from tkinter import messagebox
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfile
 
 import vlc
 from PIL import Image, ImageTk
+from pytube import YouTube
+from pytube.exceptions import RegexMatchError
 
 
 class Events:
@@ -90,8 +92,16 @@ class Events:
         p = pathlib.Path(os.path.expanduser("~"))
         fullname = askopenfilename(initialdir=p, title="Choose your file",
                                    filetypes=(("all files", "*.*"), ("mp4 files", "*.mp4")))
-        # fullname = r"D:\Documents\Programming\Python\Workspace\seamless-typewriter\videos\photosynthesis.mp4"
+        self.update_video(fullname)
+
+    def update_video(self, fullname):
+        """
+        Update the GUI video with the video file path given as a argument
+        :param fullname: video file path (+extension)
+        :return:
+        """
         if os.path.isfile(fullname):
+
             dirname = os.path.dirname(fullname)
             filename = os.path.basename(fullname)
             # Creation
@@ -170,6 +180,48 @@ class Events:
             pass  # end of sequence
 
         return frames
+
+    def file_save_dialog(self):
+        """
+        Open a save dialog to get a path where the user wants to save the downloaded youtube video to
+        :return: str/ bool - filepath or False if cancel was clicked
+        """
+        file = asksaveasfile(defaultextension=".mp4")
+        if file is None:  # asksaveasfile return `None` if dialog closed with "cancel".
+            return False
+        filename = file.name
+        file.close()
+        return filename
+
+    def on_youtube_download(self, url_entry):
+        """
+        Download and potentially play given youtube url
+        :param url_entry: field widget reference for entering the url
+        :return:
+        """
+        # Get the file path and file name to save the video too
+        fullname = self.file_save_dialog()
+        # Meaning the cancel button isn't clicked
+        if fullname is not False:
+            save_location = os.path.dirname(fullname)
+            filename = os.path.basename(fullname)
+            filename, extension = os.path.splitext(filename)
+            print("Downloading from youtube...")
+            try:
+                yt = YouTube(url_entry.get())
+                # Only get mp4 streams and choose the highest quality download
+                yt.streams.filter(subtype='mp4').first().download(output_path=save_location, filename=filename)
+            except RegexMatchError as err:
+                print("ERROR --> RegexMatchError: Invalid URL. Exiting Method")
+                return False
+            print("... 100% downloaded")
+            Tk.messagebox.showinfo("Successful Download", "Video downloaded")
+
+            # Start playing downloaded video
+            # Stop and currently playing videos
+            self.on_stop()
+            # Update the canvas with the new video
+            self.update_video(fullname)
 
     def on_play(self):
         """Toggle the status to Play/Pause.
@@ -262,17 +314,6 @@ class Events:
         # since vlc volume range is in [0, 200],
         # and our volume slider has range [0, 100], just divide by 2.
         self.volume_var.set(self._player.audio_get_volume())
-
-    def on_set_volume(self):
-        """Set the volume according to the volume sider"""
-        volume = self.volume_var.get()
-        print("volume= ", volume)
-        # volume = self.volslider.get() * 2
-        # vlc.MediaPlayer.audio_set_volume returns 0 if success, -1 otherwise
-        if volume > 100:
-            volume = 100
-        if self._player.audio_set_volume(volume) == -1:
-            self.display_error("Failed to set volume")
 
     def mute(self):
         current_vol = self.volume_var.get()
