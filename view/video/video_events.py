@@ -4,7 +4,6 @@ import platform
 import queue
 import threading
 import time
-from tkinter import *
 import tkinter as Tk
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename, asksaveasfile
@@ -12,6 +11,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfile
 import vlc
 from pytube import YouTube
 from pytube.exceptions import RegexMatchError
+
 
 class Events:
     def __init__(self, parent_frame, controller):
@@ -138,15 +138,13 @@ class Events:
         file.close()
         return filename
 
-    def on_youtube_download(self, url_entry, checkbox_sel):
+    def on_youtube_download(self, url_entry):
         """
         Download and potentially play given youtube url
         :param url_entry: field widget reference for entering the url
-        :param checkbox_sel: reference to checkbox int variable (representing the selection state)
         :return:
         """
-        auto_play = True if checkbox_sel.get() == 1 else False
-        # Get the file path and file name to save the video to
+        # Get the file path and file name to save the video too
         fullname = self.file_save_dialog()
         # Meaning the cancel button isn't clicked
         if fullname is not False:
@@ -164,12 +162,11 @@ class Events:
             print("... 100% downloaded")
             Tk.messagebox.showinfo("Successful Download", "Video downloaded")
 
-            # Start playing downloaded video if option is selected
-            if auto_play:
-                # Stop and currently playing videos
-                self.on_stop()
-                # Update the canvas with the new video
-                self.update_video(fullname)
+            # Start playing downloaded video
+            # Stop and currently playing videos
+            self.on_stop()
+            # Update the canvas with the new video
+            self.update_video(fullname)
 
     def on_play(self):
         """Toggle the status to Play/Pause.
@@ -289,4 +286,4 @@ class Events:
 
     def display_error(self, errormessage):
         """Display a simple error dialog"""
-        edialog = messagebox.showerror(self, 'Error ' + errormessage)
+        messagebox.showerror(self, 'Error ' + errormessage)
