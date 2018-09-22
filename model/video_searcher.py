@@ -34,7 +34,6 @@ class VideoSearcher:
         # frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
         previous_timestamp = 0  # Last added timestamp to the timestamp dicts
-        current_index = 0
         regex = re.compile('[%s]' % re.escape(string.punctuation))
 
         while cap.isOpened():
@@ -54,7 +53,7 @@ class VideoSearcher:
             if time_diff >= sampling_rate:
 
                 text = self.apply_ocr(frame)
-                self.timestamp_to_sentence[current_index] = text.lower()
+                self.timestamp_to_sentence[current_timestamp] = text.lower()
 
                 # Split on new line and white spaces
                 words = re.split("\n|\\s", text)
@@ -63,9 +62,8 @@ class VideoSearcher:
                 for w in words:
                     w = regex.sub('', w.lower())
                     if w != "":
-                        self.word_to_timestamps[w].add(current_index)
+                        self.word_to_timestamps[w].add(current_timestamp)
 
-                current_index += 1
                 previous_timestamp = current_timestamp
 
         self.timestamp_num = current_timestamp
