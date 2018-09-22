@@ -303,7 +303,7 @@ class Events:
         if volume > 100:
             volume = 100
         if self._player.audio_set_volume(volume) == -1:
-            self.display_error("Failed to set volume")
+            pass
 
     def on_toggle_volume(self, evt):
         """Mute/Unmute according to the audio button"""
