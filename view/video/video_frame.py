@@ -146,9 +146,9 @@ class VideoFrame(Tk.Frame):
         self.stop_button.pack(padx=10, side=Tk.LEFT)
 
         # Volume control
-        volslider = Tk.Scale(parent, variable=self.event_handler.volume_var,
-                             command=self.event_handler.volume_sel,
-                             from_=0, to=100, orient=Tk.HORIZONTAL, length=100)
+        volslider = ttk.Scale(parent, variable=self.event_handler.volume_var,
+                              command=self.event_handler.volume_sel,
+                              from_=0, to=100, orient=Tk.HORIZONTAL, length=100)
         volslider.set(100)
         volslider.pack(side=Tk.LEFT)
         return volslider
