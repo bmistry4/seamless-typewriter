@@ -5,14 +5,15 @@ import platform
 import queue
 import threading
 import time
-import tkinter as Tk
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename, asksaveasfile
-
+import tkinter as Tk
 import vlc
 from PIL import Image, ImageTk
 from pytube import YouTube
 from pytube.exceptions import RegexMatchError
+
+from view.constants import *
 
 
 class Events:
@@ -62,7 +63,7 @@ class Events:
         :param event:
         :return: None
         """
-        self.on_pause()
+        self.pause()
 
     def on_m(self, event):
         """
@@ -78,12 +79,15 @@ class Events:
             self.thread_queue.get(False)
             self.stop_loading_screen()
 
-            self.on_play()
+            self.play()
         except queue.Empty:
             self.parent_frame.after(1000, self.listen_for_thread_completion)
 
     def on_open(self):
-        """Pop up a new dialow window to choose a file, then play the selected file"""
+        """
+        Pop up a new dialog window to choose a file, then play the selected file
+        :return: bool: if video is opened or not
+        """
         # if a file is already running, then stop it.
         self.on_stop()
 
@@ -92,21 +96,26 @@ class Events:
         p = pathlib.Path(os.path.expanduser("~"))
         fullname = askopenfilename(initialdir=p, title="Choose your file",
                                    filetypes=(("all files", "*.*"), ("mp4 files", "*.mp4")))
-        self.update_video(fullname)
+        is_updated = self.update_video(fullname)
+        return is_updated
 
     def update_video(self, fullname):
         """
         Update the GUI video with the video file path given as a argument
         :param fullname: video file path (+extension)
-        :return:
+        :return: bool on if the video was updated or not
         """
         if os.path.isfile(fullname):
 
             dirname = os.path.dirname(fullname)
             filename = os.path.basename(fullname)
-            # Creation
-            self.media = self.video_instance.media_new(str(os.path.join(dirname, filename)))
-            self._player.set_media(self.media)
+            try:
+                # Creation
+                self.media = self.video_instance.media_new(str(os.path.join(dirname, filename)))
+                self._player.set_media(self.media)
+            except Exception as err:
+                print("ERROR --> Exception thrown in update_video")
+                return False
 
             # Report the title of the file chosen
             title = self._player.get_title()
@@ -132,6 +141,9 @@ class Events:
             self.parent_frame.after(1000, self.listen_for_thread_completion)
 
             self.display_loading_screen()
+            return True
+        else:
+            return False
 
     def display_loading_screen(self):
         self.loading_frames = self.load_gif("resources/loading.gif")
@@ -153,7 +165,8 @@ class Events:
         self.loading_frame = self.loading_frames[index]
 
         self.loading_canvas.delete("all")
-        self.loading_canvas.create_image(self.loading_canvas.winfo_width() // 2, self.loading_canvas.winfo_height() // 2,
+        self.loading_canvas.create_image(self.loading_canvas.winfo_width() // 2,
+                                         self.loading_canvas.winfo_height() // 2,
                                          image=self.loading_frame, anchor=Tk.CENTER)
         if self.loading:
             # if still loading then call this method again to update next frame
@@ -223,31 +236,41 @@ class Events:
             # Update the canvas with the new video
             self.update_video(fullname)
 
-    def on_play(self):
+    def play(self):
         """Toggle the status to Play/Pause.
         If no file is loaded, open the dialog window.
+        :return: bool on if the video was played successfully or not
         """
         # check if there is a file to play, otherwise open a
         # Tk.FileDialog to select a file
         if not self._player.get_media():
-            self.on_open()
+            is_opened = self.on_open()
+            return is_opened
         else:
             # Try to launch the media, if this fails display an error message
             if self._player.play() == -1:
                 self.display_error("Unable to play.")
+                return False
+        return True
 
     def get_handle(self):
         return self._video_panel.winfo_id()
 
-    def on_pause(self):
+    def pause(self):
         """Pause the player"""
         self._player.pause()
 
-    def on_stop(self):
+    def on_stop(self, pause_button=None):
         """Stop the player"""
         self._player.stop()
         # reset the time slider
         self._time_slider.set(0)
+
+        # Make play-pause button show the play icon again
+        if pause_button is not None:
+            photo = Tk.PhotoImage(file=play_image_up)
+            pause_button.config(image=photo)
+            pause_button.image = photo  # keep ref so isn't garbage collected
 
     def on_timer(self):
         """Update the time slider according to the current movie time"""

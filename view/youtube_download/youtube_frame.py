@@ -19,11 +19,12 @@ class YoutubeFrame(Tk.Frame):
         # Create gui components and pack them
         url_entry = EntryWithPlaceholder(self, "Enter YouTube URL")
 
-        file = r"resources\test.png"
+        file = r"resources\yt_download.png"
         im = PIL.Image.open(file)
-        im = im.resize((100, 50), PIL.Image.ANTIALIAS)
+        im = im.resize((120, 50), PIL.Image.ANTIALIAS)
         photo = PIL.ImageTk.PhotoImage(im)
-        download_button = Tk.Button(self, image=photo, bd=0)
+        download_button = Tk.Button(self, image=photo, bd=0,
+                                    command=partial(self.event_handler.on_youtube_download, url_entry=url_entry))
         download_button.image = photo  # keep a reference to avoid garbage collection!
 
         # download_button = Tk.Button(self, text="Download", command=partial(self.event_handler.on_youtube_download,
