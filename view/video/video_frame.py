@@ -75,36 +75,27 @@ class VideoFrame(Tk.Frame):
         canvas = Tk.Canvas(parent)
         canvas.pack(fill=Tk.BOTH, expand=1)
 
-    # TODO - remove once feat impl
-    # def action(self, is_paused=[True]):
-    #     """
-    #     toggle the button with up/down images,
-    #     using a list element as static variable
-    #     """
-    #     if is_paused[0]:
-    #         self.play_pause_button.config(image=self.play_image_down_photo)
-    #         is_paused[0] = False
-    #     else:
-    #         self.play_pause_button.config(image=self.play_image_up_photo)
-    #         is_paused[0] = True
-
     def generate_control_panel(self, parent):
         """
         Create the buttons used for user options to control the video (e.g. play, pause, stop...)
-        :param parent:
+        :param parent: Parent frame
         :return:
         """
+        # Play-pause button along with bindings for: clicking, entering (i.e. hovering) and leaving the widget
         self.play_pause_button = Tk.Button(parent, image=self.play_image_up_photo, bd=0,
                                            command=self.event_handler.on_play_pause)
         self.play_pause_button.bind("<Enter>", self.event_handler.on_enter_play_pause)
         self.play_pause_button.bind("<Leave>", self.event_handler.on_leave_play_pause)
+        # Make this property accessible to the widget object
         self.play_pause_button.is_paused = True  # Set to initially paused (as there is no video loaded)
 
+        # Stop button along with bindings for: clicking, entering (i.e. hovering) and leaving the widget
         stop_button = Tk.Button(parent, image=self.stop_image_up_photo, bd=0,
                                 command=partial(self.event_handler.on_stop, pause_button=self.play_pause_button))
         stop_button.bind("<Enter>", self.event_handler.on_enter_stop)
         stop_button.bind("<Leave>", self.event_handler.on_leave_stop)
 
+        # Button positioning w.r.t the parent
         self.play_pause_button.pack(padx=10, side=Tk.LEFT)
         stop_button.pack(padx=10, side=Tk.LEFT)
 

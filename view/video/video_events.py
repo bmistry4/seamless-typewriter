@@ -8,6 +8,7 @@ import time
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename, asksaveasfile
 import tkinter as Tk
+
 import vlc
 from PIL import Image, ImageTk
 from pytube import YouTube
@@ -17,6 +18,10 @@ from view.constants import *
 
 
 class Events:
+    """
+    Contains the logic for widget bindings e.g. button clicks
+    """
+
     def __init__(self, parent_frame, controller):
         self.parent_frame = parent_frame
         self.controller = controller
@@ -57,10 +62,16 @@ class Events:
         self.load_button_photos()
 
     def load_button_photos(self):
+        """
+        Create photo variables which are used for setting the video button icons
+        :return:
+        """
         self.play_image_down_photo = Tk.PhotoImage(file=play_image_down)
         self.play_image_up_photo = Tk.PhotoImage(file=play_image_up)
+
         self.stop_image_down_photo = Tk.PhotoImage(file=stop_image_down)
         self.stop_image_up_photo = Tk.PhotoImage(file=stop_image_up)
+
         self.pause_image_down_photo = Tk.PhotoImage(file=pause_image_down)
         self.pause_image_up_photo = Tk.PhotoImage(file=pause_image_up)
 
@@ -84,7 +95,6 @@ class Events:
         :return: None
         """
         self.on_play_pause()
-
 
     def on_p(self, event):
         """
@@ -301,10 +311,18 @@ class Events:
             pause_button.config(image=photo)
             pause_button.image = photo  # keep ref so isn't garbage collected
 
-
     def on_play_pause(self):
+        """
+        Event when the play/ pause button is clicked
+        If icon is clicked on play -> play video and change icon to pause
+        If icon is clicked on paused -> pause video and change icon to play
+        This method is called on clicking the button so the resulting icon will be on the hover state
+        :return: None
+        """
         if self._play_pause_button.is_paused:
             is_playing = self.play()
+            # Only change icon if the video can be played
+            # This avoids the case then a user cancels a video selection and no video plays (so icon does not change)
             if is_playing:
                 self._play_pause_button.config(image=self.pause_image_down_photo)
                 self._play_pause_button.is_paused = not self._play_pause_button.is_paused
@@ -314,21 +332,41 @@ class Events:
             self._play_pause_button.is_paused = not self._play_pause_button.is_paused
 
     def on_enter_play_pause(self, event):
+        """
+        On hovering over the play-pause button, change the icon to be in hover state
+        :param event: Hover over event
+        :return: None
+        """
         if self._play_pause_button.is_paused:
             event.widget.config(image=self.play_image_down_photo)
         else:
             event.widget.config(image=self.pause_image_down_photo)
 
     def on_leave_play_pause(self, event):
+        """
+        On the mouse leaving the widget. Change the icon to be on the non-hover state
+        :param event: Leaving the hover state
+        :return: None
+        """
         if self._play_pause_button.is_paused:
             event.widget.config(image=self.play_image_up_photo)
         else:
             event.widget.config(image=self.pause_image_up_photo)
 
     def on_enter_stop(self, event):
+        """
+        Hovering over the stop button.
+        :param event: Hover event
+        :return: None
+        """
         event.widget.config(image=self.stop_image_down_photo)
 
     def on_leave_stop(self, event):
+        """
+        Mouse leaving the stop button
+        :param event: Leaving the hover state
+        :return: None
+        """
         event.widget.config(image=self.stop_image_up_photo)
 
     def on_timer(self):
@@ -398,6 +436,10 @@ class Events:
         self.volume_var.set(self._player.audio_get_volume())
 
     def mute(self):
+        """
+        Muting/ unmuting the volume
+        :return:
+        """
         current_vol = self.volume_var.get()
         if current_vol != 0:
             self.prev_vol = current_vol

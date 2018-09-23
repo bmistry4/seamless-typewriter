@@ -17,7 +17,7 @@ class VideoSearcher:
         self.timestamp_to_sentence = {}  # Keep track of full text relating to a timestamp
 
         self.timestamp_num = 0  # initial value of total number of timestamps
-        self.video_length = 0   # initial value of length of video in seconds
+        self.video_length = 0  # initial value of length of video in seconds
 
         self.populate_timestamp_structures(3)
 
