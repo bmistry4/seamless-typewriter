@@ -44,6 +44,28 @@ class Events:
         self.loading_frame = None
         self.loading_size = 50
 
+        # video buttons
+        self.is_paused = True
+        self._stop_button = None
+        self._play_pause_button = None
+
+        # video buttons resources
+        self.play_image_down_photo = None
+        self.play_image_up_photo = None
+        self.stop_image_down_photo = None
+        self.stop_image_up_photo = None
+        self.pause_image_down_photo = None
+        self.pause_image_up_photo = None
+        self.load_button_photos()
+
+    def load_button_photos(self):
+        self.play_image_down_photo = Tk.PhotoImage(file=play_image_down)
+        self.play_image_up_photo = Tk.PhotoImage(file=play_image_up)
+        self.stop_image_down_photo = Tk.PhotoImage(file=stop_image_down)
+        self.stop_image_up_photo = Tk.PhotoImage(file=stop_image_up)
+        self.pause_image_down_photo = Tk.PhotoImage(file=pause_image_down)
+        self.pause_image_up_photo = Tk.PhotoImage(file=pause_image_up)
+
     def on_exit(self, evt):
         """Closes the window"""
         self.Close()
@@ -271,6 +293,36 @@ class Events:
             photo = Tk.PhotoImage(file=play_image_up)
             pause_button.config(image=photo)
             pause_button.image = photo  # keep ref so isn't garbage collected
+
+
+    def on_play_pause(self):
+        if self.is_paused:
+            is_playing = self.play()
+            if is_playing:
+                self._play_pause_button.config(image=self.pause_image_down_photo)
+                self.is_paused = not self.is_paused
+        else:
+            self.pause()
+            self._play_pause_button.config(image=self.play_image_down_photo)
+            self.is_paused = not self.is_paused
+
+    def on_enter_play_pause(self, event):
+        if self.is_paused:
+            self._play_pause_button.config(image=self.play_image_down_photo)
+        else:
+            self._play_pause_button.config(image=self.pause_image_down_photo)
+
+    def on_leave_play_pause(self, event):
+        if self.is_paused:
+            self._play_pause_button.config(image=self.play_image_up_photo)
+        else:
+            self._play_pause_button.config(image=self.pause_image_up_photo)
+
+    def on_enter_stop(self, event):
+        self._stop_button.config(image=self.stop_image_down_photo)
+
+    def on_leave_stop(self, event):
+        self._stop_button.config(image=self.stop_image_up_photo)
 
     def on_timer(self):
         """Update the time slider according to the current movie time"""

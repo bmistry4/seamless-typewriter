@@ -1,5 +1,9 @@
 import sys
 
+from view.video.tkk_timer import TkkTimer
+from functools import partial
+from view.constants import *
+
 if sys.version_info[0] < 3:
     import Tkinter as Tk
     from tkinter import ttk
@@ -8,9 +12,6 @@ else:
     from tkinter.constants import *
     from tkinter import ttk
 
-from view.video.tkk_timer import TkkTimer
-from functools import partial
-from view.constants import *
 
 class VideoFrame(Tk.Frame):
     """The main window (frame) containing all video related GUI components. This includes: the video, and all video
@@ -23,16 +24,11 @@ class VideoFrame(Tk.Frame):
         self.parent = parent
         self.event_handler = event_handler
 
-        self.is_paused = True
         self.play_pause_button = None
         self.stop_button = None
 
-        self.play_image_down_photo = None
         self.play_image_up_photo = None
-        self.stop_image_down_photo = None
         self.stop_image_up_photo = None
-        self.pause_image_down_photo = None
-        self.pause_image_up_photo = None
         self.load_button_photos()
 
         # Create video panel
@@ -55,6 +51,9 @@ class VideoFrame(Tk.Frame):
         self.event_handler._volume_slider = volume_slider
         self.event_handler._time_slider = time_slider
 
+        self.event_handler._stop_button = self.stop_button
+        self.event_handler._play_pause_button = self.play_pause_button
+
         # Deal with layout of sub-frames (containers)
         # Let the video expand on resizing and let the slider expand on the X only. Let controls just be added below
         # the slider
@@ -66,12 +65,8 @@ class VideoFrame(Tk.Frame):
         self.pack(fill=BOTH, expand=True)
 
     def load_button_photos(self):
-        self.play_image_down_photo = Tk.PhotoImage(file=play_image_down)
         self.play_image_up_photo = Tk.PhotoImage(file=play_image_up)
-        self.stop_image_down_photo = Tk.PhotoImage(file=stop_image_down)
         self.stop_image_up_photo = Tk.PhotoImage(file=stop_image_up)
-        self.pause_image_down_photo = Tk.PhotoImage(file=pause_image_down)
-        self.pause_image_up_photo = Tk.PhotoImage(file=pause_image_up)
 
     def generate_video_panel(self, parent):
         """
@@ -82,50 +77,18 @@ class VideoFrame(Tk.Frame):
         canvas = Tk.Canvas(parent)
         canvas.pack(fill=Tk.BOTH, expand=1)
 
-
-    def action(self, is_paused=[True]):
-        """
-        toggle the button with up/down images,
-        using a list element as static variable
-        """
-        if is_paused[0]:
-            self.play_pause_button.config(image=self.play_image_down_photo)
-            is_paused[0] = False
-        else:
-            self.play_pause_button.config(image=self.play_image_up_photo)
-            is_paused[0] = True
-
-    def on_play_pause(self):
-        if self.is_paused:
-            is_playing = self.event_handler.play()
-            if is_playing:
-                self.play_pause_button.config(image=self.pause_image_down_photo)
-                self.is_paused = not self.is_paused
-        else:
-            self.event_handler.pause()
-            self.play_pause_button.config(image=self.play_image_down_photo)
-            self.is_paused = not self.is_paused
-
-
-    def on_enter_play_pause(self, event):
-        if self.is_paused:
-            self.play_pause_button.config(image=self.play_image_down_photo)
-        else:
-            self.play_pause_button.config(image=self.pause_image_down_photo)
-
-
-    def on_leave_play_pause(self, event):
-        if self.is_paused:
-            self.play_pause_button.config(image=self.play_image_up_photo)
-        else:
-            self.play_pause_button.config(image=self.pause_image_up_photo)
-
-    def on_enter_stop(self, event):
-        self.stop_button.config(image=self.stop_image_down_photo)
-
-    def on_leave_stop(self, event):
-        self.stop_button.config(image=self.stop_image_up_photo)
-
+    # TODO - remove once feat impl
+    # def action(self, is_paused=[True]):
+    #     """
+    #     toggle the button with up/down images,
+    #     using a list element as static variable
+    #     """
+    #     if is_paused[0]:
+    #         self.play_pause_button.config(image=self.play_image_down_photo)
+    #         is_paused[0] = False
+    #     else:
+    #         self.play_pause_button.config(image=self.play_image_up_photo)
+    #         is_paused[0] = True
 
     def generate_control_panel(self, parent):
         """
@@ -133,14 +96,15 @@ class VideoFrame(Tk.Frame):
         :param parent:
         :return:
         """
-        self.play_pause_button = Tk.Button(parent, image=self.play_image_up_photo, bd=0, command=self.on_play_pause)
-        self.play_pause_button.bind("<Enter>", self.on_enter_play_pause)
-        self.play_pause_button.bind("<Leave>", self.on_leave_play_pause)
+        self.play_pause_button = Tk.Button(parent, image=self.play_image_up_photo, bd=0,
+                                           command=self.event_handler.on_play_pause)
+        self.play_pause_button.bind("<Enter>", self.event_handler.on_enter_play_pause)
+        self.play_pause_button.bind("<Leave>", self.event_handler.on_leave_play_pause)
 
         self.stop_button = Tk.Button(parent, image=self.stop_image_up_photo, bd=0,
                                      command=partial(self.event_handler.on_stop, pause_button=self.play_pause_button))
-        self.stop_button.bind("<Enter>", self.on_enter_stop)
-        self.stop_button.bind("<Leave>", self.on_leave_stop)
+        self.stop_button.bind("<Enter>", self.event_handler.on_enter_stop)
+        self.stop_button.bind("<Leave>", self.event_handler.on_leave_stop)
 
         self.play_pause_button.pack(padx=10, side=Tk.LEFT)
         self.stop_button.pack(padx=10, side=Tk.LEFT)
