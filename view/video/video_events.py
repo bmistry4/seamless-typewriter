@@ -45,8 +45,6 @@ class Events:
         self.loading_size = 50
 
         # video buttons
-        self.is_paused = True
-        self._stop_button = None
         self._play_pause_button = None
 
         # video buttons resources
@@ -296,33 +294,33 @@ class Events:
 
 
     def on_play_pause(self):
-        if self.is_paused:
+        if self._play_pause_button.is_paused:
             is_playing = self.play()
             if is_playing:
                 self._play_pause_button.config(image=self.pause_image_down_photo)
-                self.is_paused = not self.is_paused
+                self._play_pause_button.is_paused = not self._play_pause_button.is_paused
         else:
             self.pause()
             self._play_pause_button.config(image=self.play_image_down_photo)
-            self.is_paused = not self.is_paused
+            self._play_pause_button.is_paused = not self._play_pause_button.is_paused
 
     def on_enter_play_pause(self, event):
-        if self.is_paused:
-            self._play_pause_button.config(image=self.play_image_down_photo)
+        if self._play_pause_button.is_paused:
+            event.widget.config(image=self.play_image_down_photo)
         else:
-            self._play_pause_button.config(image=self.pause_image_down_photo)
+            event.widget.config(image=self.pause_image_down_photo)
 
     def on_leave_play_pause(self, event):
-        if self.is_paused:
-            self._play_pause_button.config(image=self.play_image_up_photo)
+        if self._play_pause_button.is_paused:
+            event.widget.config(image=self.play_image_up_photo)
         else:
-            self._play_pause_button.config(image=self.pause_image_up_photo)
+            event.widget.config(image=self.pause_image_up_photo)
 
     def on_enter_stop(self, event):
-        self._stop_button.config(image=self.stop_image_down_photo)
+        event.widget.config(image=self.stop_image_down_photo)
 
     def on_leave_stop(self, event):
-        self._stop_button.config(image=self.stop_image_up_photo)
+        event.widget.config(image=self.stop_image_up_photo)
 
     def on_timer(self):
         """Update the time slider according to the current movie time"""

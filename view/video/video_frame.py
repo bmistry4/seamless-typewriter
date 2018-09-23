@@ -25,7 +25,6 @@ class VideoFrame(Tk.Frame):
         self.event_handler = event_handler
 
         self.play_pause_button = None
-        self.stop_button = None
 
         self.play_image_up_photo = None
         self.stop_image_up_photo = None
@@ -51,7 +50,6 @@ class VideoFrame(Tk.Frame):
         self.event_handler._volume_slider = volume_slider
         self.event_handler._time_slider = time_slider
 
-        self.event_handler._stop_button = self.stop_button
         self.event_handler._play_pause_button = self.play_pause_button
 
         # Deal with layout of sub-frames (containers)
@@ -100,14 +98,15 @@ class VideoFrame(Tk.Frame):
                                            command=self.event_handler.on_play_pause)
         self.play_pause_button.bind("<Enter>", self.event_handler.on_enter_play_pause)
         self.play_pause_button.bind("<Leave>", self.event_handler.on_leave_play_pause)
+        self.play_pause_button.is_paused = True  # Set to initially paused (as there is no video loaded)
 
-        self.stop_button = Tk.Button(parent, image=self.stop_image_up_photo, bd=0,
-                                     command=partial(self.event_handler.on_stop, pause_button=self.play_pause_button))
-        self.stop_button.bind("<Enter>", self.event_handler.on_enter_stop)
-        self.stop_button.bind("<Leave>", self.event_handler.on_leave_stop)
+        stop_button = Tk.Button(parent, image=self.stop_image_up_photo, bd=0,
+                                command=partial(self.event_handler.on_stop, pause_button=self.play_pause_button))
+        stop_button.bind("<Enter>", self.event_handler.on_enter_stop)
+        stop_button.bind("<Leave>", self.event_handler.on_leave_stop)
 
         self.play_pause_button.pack(padx=10, side=Tk.LEFT)
-        self.stop_button.pack(padx=10, side=Tk.LEFT)
+        stop_button.pack(padx=10, side=Tk.LEFT)
 
         # Volume control
         volslider = ttk.Scale(parent, variable=self.event_handler.volume_var,
