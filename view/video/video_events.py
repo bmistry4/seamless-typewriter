@@ -77,13 +77,22 @@ class Events:
         """
         self.on_open()
 
+    def on_space(self, event):
+        """
+        Key binding for '<space>' which is pause and unpause
+        :param event:
+        :return: None
+        """
+        self.on_play_pause()
+
+
     def on_p(self, event):
         """
         Key binding for 'p', pause and unpause
         :param event:
         :return: None
         """
-        self.pause()
+        self.on_play_pause()
 
     def on_m(self, event):
         """

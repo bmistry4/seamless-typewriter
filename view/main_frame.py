@@ -50,6 +50,7 @@ class MainFrame(Frame):
         # Add key bindings
         self.root_Tk.bind("<Control-o>", self.event_handler.on_ctrl_o)
         self.root_Tk.bind("<p>", self.event_handler.on_p)
+        self.root_Tk.bind("<space>", self.event_handler.on_space)
         self.root_Tk.bind("<m>", self.event_handler.on_m)
 
     def generate_menubar(self, parent):
